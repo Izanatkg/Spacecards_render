@@ -1,15 +1,16 @@
 require('dotenv').config();
 const { GoogleAuth } = require('google-auth-library');
 
-const ISSUER_ID = process.env.GOOGLE_WALLET_ISSUER_ID;
+const ISSUER_ID = '3388000000022884108';
 const CLASS_ID = `${ISSUER_ID}.pokemon_loyalty_card`;
-const CLIENT_ID = process.env.GOOGLE_OAUTH_CLIENT_ID;
-const CLIENT_SECRET = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+
+// Usar el client_id del archivo de credenciales
+const serviceAccount = require('./puntos-loyvers-2b7433c755f0.json');
 
 // Configurar autenticación usando credenciales de servicio
 const auth = new GoogleAuth({
     scopes: ['https://www.googleapis.com/auth/wallet_object.issuer'],
-    keyFile: './google-wallet-key.json' // Archivo de credenciales de servicio
+    keyFile: './puntos-loyvers-2b7433c755f0.json'
 });
 
 const loyaltyClass = {
@@ -21,7 +22,7 @@ const loyaltyClass = {
             uri: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png'
         }
     },
-    reviewStatus: 'UNDER_REVIEW',
+    reviewStatus: 'ACTIVE',
     hexBackgroundColor: '#FF5733',
     heroImage: {
         sourceUri: {
@@ -44,6 +45,5 @@ module.exports = {
     auth,
     ISSUER_ID,
     CLASS_ID,
-    CLIENT_ID,
     loyaltyClass
 };

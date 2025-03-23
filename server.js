@@ -4,21 +4,48 @@ const dotenv = require('dotenv');
 const QRCode = require('qrcode');
 const axios = require('axios');
 const googleWalletService = require('./google-wallet-service');
+const fs = require('fs').promises;
+const path = require('path');
 
 dotenv.config();
 
 const app = express();
 const LOYVERSE_TOKEN = '68c66646696548af983a2a0b8e64c2ec';
 const LOYVERSE_API_URL = 'https://api.loyverse.com/v1.0';
+const COUNTER_FILE = path.join(__dirname, 'customer_counter.txt');
+
+// Función para obtener y actualizar el contador de clientes
+async function getNextCustomerId() {
+    try {
+        // Intentar leer el archivo
+        const counter = await fs.readFile(COUNTER_FILE, 'utf8');
+        const nextId = parseInt(counter) + 1;
+        // Guardar el nuevo contador
+        await fs.writeFile(COUNTER_FILE, nextId.toString());
+        return nextId;
+    } catch (error) {
+        // Si el archivo no existe, comenzar desde 600000
+        await fs.writeFile(COUNTER_FILE, '600001');
+        return 600000;
+    }
+}
+
+// Configurar cliente de Loyverse
+const loyverseApi = axios.create({
+    baseURL: LOYVERSE_API_URL,
+    headers: {
+        'Authorization': `Bearer ${LOYVERSE_TOKEN}`,
+        'Content-Type': 'application/json'
+    }
+});
 
 // CORS configuration
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Middleware
 app.use(express.json());
 
 // Debug middleware for logging requests
@@ -39,15 +66,6 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Loyverse API integration
-const loyverseApi = axios.create({
-    baseURL: LOYVERSE_API_URL,
-    headers: {
-        'Authorization': `Bearer ${LOYVERSE_TOKEN}`,
-        'Content-Type': 'application/json'
-    }
-});
-
 // Test Loyverse connection on startup
 loyverseApi.get('/stores')
     .then(response => {
@@ -59,7 +77,10 @@ loyverseApi.get('/stores')
     });
 
 // Routes
-app.post('/api/register', async (req, res) => {
+const apiRouter = express.Router();
+app.use('/api', apiRouter);
+
+apiRouter.post('/register', async (req, res) => {
     console.log('Starting registration process...');
     try {
         const { fullName, email, phone, isQRRegistration } = req.body;
@@ -89,13 +110,18 @@ app.post('/api/register', async (req, res) => {
             });
         }
 
+        // Generar ID numérico para el cliente
+        const customerId = await getNextCustomerId();
+        const customerIdStr = customerId.toString();
+        
         console.log('Creating customer in Loyverse...');
         // Register user in Loyverse
         const loyverseCustomerData = {
             name: fullName,
             email: email,
             phone_number: phone,
-            note: isQRRegistration ? "Registro desde QR" : "Registro web",
+            customer_code: customerIdStr, // Campo correcto para el código de cliente
+            note: "Registrado desde el Sistema de lealtad",
             loyalty_program_enabled: true
         };
 
@@ -112,46 +138,48 @@ app.post('/api/register', async (req, res) => {
 
         console.log('Loyverse customer created:', loyverseResponse.data);
 
+        // Generar QR code con el ID numérico
+        const qrCode = await QRCode.toDataURL(customerIdStr, {
+            errorCorrectionLevel: 'H',
+            margin: 1,
+            width: 300
+        });
+
         // Crear pase de Google Wallet
         console.log('Creating Google Wallet pass...');
+        let walletUrl = null;
         try {
-            const walletUrl = await googleWalletService.createLoyaltyObject(
+            console.log('Creating wallet pass for user:', loyverseResponse.data.id);
+            walletUrl = await googleWalletService.createLoyaltyObject(
                 loyverseResponse.data.id,
                 {
                     name: fullName,
-                    email: email
+                    email: email,
+                    reference_id: customerIdStr
                 }
             );
-
-            console.log('Registration process completed successfully');
-            return res.status(201).json({
-                success: true,
-                message: "Usuario registrado exitosamente",
-                welcomeBonus: "10% en tu primera compra",
-                user: {
-                    fullName,
-                    email,
-                    phone,
-                    loyverseId: loyverseResponse.data.id,
-                    isQRRegistration
-                },
-                walletUrl: walletUrl
-            });
-        } catch (walletError) {
-            console.error('Wallet error:', walletError);
-            return res.status(201).json({
-                success: true,
-                message: "Usuario registrado exitosamente, pero hubo un problema al crear la tarjeta de Google Wallet",
-                user: {
-                    fullName,
-                    email,
-                    phone,
-                    loyverseId: loyverseResponse.data.id,
-                    isQRRegistration
-                },
-                walletError: 'No se pudo crear la tarjeta de Google Wallet. Por favor intente más tarde.'
-            });
+            console.log('Wallet URL generated:', walletUrl);
+        } catch (error) {
+            console.error('Error creating Google Wallet pass:', error);
+            // No retornamos error, continuamos con el registro
         }
+
+        console.log('Registration process completed successfully');
+        return res.status(201).json({
+            success: true,
+            message: walletUrl ? "Usuario registrado exitosamente" : "Usuario registrado exitosamente, pero hubo un problema al crear la tarjeta de Google Wallet",
+            welcomeBonus: "10% en tu primera compra",
+            user: {
+                fullName,
+                email,
+                phone,
+                loyverseId: loyverseResponse.data.id,
+                customerId: customerIdStr,
+                isQRRegistration
+            },
+            qrCode: qrCode,
+            walletUrl: walletUrl
+        });
     } catch (error) {
         console.error('Registration error:', error.response?.data || error.message);
         const errorMessage = error.response?.data?.message || 
@@ -166,7 +194,7 @@ app.post('/api/register', async (req, res) => {
 });
 
 // Generate QR Code endpoint
-app.get('/api/generate-qr', async (req, res) => {
+apiRouter.get('/generate-qr', async (req, res) => {
     try {
         const registrationUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/register?qr=true`;
         const qrCode = await QRCode.toDataURL(registrationUrl);
@@ -181,7 +209,7 @@ app.get('/api/generate-qr', async (req, res) => {
 });
 
 // Actualizar puntos en Google Wallet
-app.post('/api/update-points', async (req, res) => {
+apiRouter.post('/update-points', async (req, res) => {
     try {
         const { userId, points } = req.body;
         if (!userId || points === undefined) {

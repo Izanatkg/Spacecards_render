@@ -1,89 +1,80 @@
-# Pokémon Loyalty System
+# Sistema de Lealtad Pokémon
 
-Sistema de lealtad temático de Pokémon integrado con Google Wallet y Loyverse POS.
+Sistema de lealtad para Mamitas Tepic que integra Loyverse POS con Google Wallet.
 
 ## Características
 
-- Registro de usuarios con tarjeta de lealtad digital
-- Integración con Google Wallet para tarjetas digitales
-- Integración con Loyverse POS para gestión de clientes
-- Diseño temático de Pokémon
-- Sistema de puntos y recompensas
-- Registro mediante QR
-
-## Tecnologías
-
-- **Backend**: Node.js con Express
-- **Frontend**: React con Material-UI
-- **APIs**: 
-  - Google Wallet API
-  - Loyverse API
-- **Base de datos**: Loyverse (gestión de clientes y puntos)
+- Registro de clientes con generación automática de códigos QR
+- Integración con Loyverse para gestión de puntos
+- Integración con Google Wallet para tarjetas de lealtad digitales
+- Interfaz moderna y responsiva
+- Sistema de bonificación para nuevos clientes
 
 ## Requisitos
 
-- Node.js 16 o superior
-- Cuenta de Google Cloud con Google Wallet API habilitada
-- Cuenta de Loyverse POS
-- Credenciales de servicio de Google Cloud
+- Node.js v16 o superior
+- Cuenta de Loyverse con API habilitada
+- Cuenta de Google Cloud con API de Google Wallet habilitada
 
 ## Configuración
 
-1. Clona el repositorio:
+1. Clonar el repositorio:
 ```bash
-git clone https://github.com/tu-usuario/pokemon-loyalty-system.git
+git clone <url-del-repositorio>
 cd pokemon-loyalty-system
 ```
 
-2. Instala las dependencias:
+2. Instalar dependencias:
 ```bash
-# Instalar dependencias del servidor
 npm install
-
-# Instalar dependencias del cliente
-cd client
+cd client-new
 npm install
 ```
 
-3. Configura las variables de entorno:
-   - Crea un archivo `.env` en la raíz del proyecto
-   - Añade las siguientes variables:
-```env
-LOYVERSE_TOKEN=tu_token_de_loyverse
-FRONTEND_URL=http://localhost:3000
-GOOGLE_WALLET_ISSUER_ID=tu_issuer_id
-PORT=5000
+3. Configurar variables de entorno:
+Crear un archivo `.env` en la raíz del proyecto con:
+```
+LOYVERSE_API_TOKEN=<tu-token-de-loyverse>
 ```
 
-4. Configura las credenciales de Google Wallet:
-   - Coloca el archivo `google-wallet-key.json` en la raíz del proyecto
+4. Configurar Google Wallet:
+- Colocar el archivo de credenciales de Google Cloud (`puntos-loyvers-2b7433c755f0.json`) en la raíz del proyecto
 
-## Uso
+## Desarrollo
 
-1. Inicia el servidor:
+1. Iniciar el servidor:
 ```bash
 npm start
 ```
 
-2. En otra terminal, inicia el cliente:
+2. En otra terminal, iniciar el cliente:
 ```bash
-cd client
+cd client-new
 npm start
 ```
 
-3. Abre http://localhost:3000 en tu navegador
+## Producción
 
-## Estructura del Proyecto
+Para construir la versión de producción:
 
+```bash
+cd client-new
+npm run build
 ```
-pokemon-loyalty-system/
-├── client/                 # Frontend React
-├── google-wallet-config.js # Configuración de Google Wallet
-├── google-wallet-service.js# Servicios de Google Wallet
-├── server.js              # Servidor Express
-└── README.md
-```
+
+## API Endpoints
+
+- `POST /api/register`: Registra un nuevo cliente
+- `GET /api/customer/:id`: Obtiene información de un cliente
+- `PUT /api/points/:id`: Actualiza los puntos de un cliente
+
+## Tecnologías
+
+- Backend: Node.js, Express
+- Frontend: React, Material-UI
+- APIs: Loyverse, Google Wallet
+- Base de datos: MongoDB (pendiente de implementar)
 
 ## Licencia
 
-MIT
+Este proyecto es privado y confidencial.

@@ -8,7 +8,8 @@ import {
     Box,
     CircularProgress,
     Alert,
-    Snackbar
+    Snackbar,
+    Link
 } from '@mui/material';
 import { QRCodeSVG } from 'qrcode.react';
 import axios from '../config/axios';
@@ -132,42 +133,61 @@ const Register = () => {
                             </Box>
                         )}
                         {registrationData.walletUrl && (
-                          <Box sx={{ mt: 2, textAlign: 'center' }}>
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                              Para agregar tu tarjeta a Google Wallet:
-                            </Typography>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                              <Button
-                                variant="contained"
-                                color="primary"
+                          <Box sx={{ 
+                            mt: 3, 
+                            mb: 2,
+                            textAlign: 'center'
+                          }}>
+                            <Box sx={{ 
+                              display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center'
+                            }}>
+                              <a 
                                 href={registrationData.walletUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                sx={{ 
-                                  backgroundColor: '#4285f4',
-                                  '&:hover': {
-                                    backgroundColor: '#3367d6'
-                                  }
+                                style={{ 
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  textDecoration: 'none',
+                                  backgroundColor: '#000000',
+                                  color: '#FFFFFF',
+                                  padding: '8px 16px',
+                                  borderRadius: '24px',
+                                  gap: '8px',
+                                  height: '48px'
                                 }}
                               >
-                                Agregar a Google Wallet
-                              </Button>
-                              <Typography variant="caption" color="text.secondary">
-                                Si el botón no funciona, desactiva el bloqueador de anuncios
-                              </Typography>
+                                <img
+                                  src="https://fonts.gstatic.com/s/i/productlogos/wallet/v8/192px.svg"
+                                  alt="Google Wallet"
+                                  style={{
+                                    height: '24px',
+                                    width: 'auto'
+                                  }}
+                                />
+                                <span style={{
+                                  fontFamily: 'Roboto, Arial, sans-serif',
+                                  fontSize: '16px',
+                                  fontWeight: '500'
+                                }}>
+                                  Add to Google Wallet
+                                </span>
+                              </a>
                             </Box>
                           </Box>
                         )}
                         <Typography variant="body1" sx={{ mt: 2, color: 'success.main', fontWeight: 'bold' }}>
-                          {registrationData.welcomeBonus && `¡Bienvenido! Tienes ${registrationData.welcomeBonus}!`}
+                            {registrationData.welcomeBonus && `¡Bienvenido! Tienes ${registrationData.welcomeBonus}!`}
                         </Typography>
                         <Button
-                          variant="outlined"
-                          color="primary"
-                          onClick={handleReset}
-                          sx={{ mt: 3 }}
+                            variant="outlined"
+                            color="primary"
+                            onClick={handleReset}
+                            sx={{ mt: 3 }}
                         >
-                          Registrar otro usuario
+                            Registrar otro usuario
                         </Button>
                     </Box>
                 )}

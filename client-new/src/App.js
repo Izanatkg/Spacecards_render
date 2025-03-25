@@ -25,11 +25,18 @@ const theme = createTheme({
   },
 });
 
+const routerConfig = {
+  future: {
+    v7_startTransition: true,
+    v7_relativeSplatPath: true
+  }
+};
+
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
+      <Router {...routerConfig}>
         <Navigation />
         <Routes>
           <Route path="/" element={<Home />} />

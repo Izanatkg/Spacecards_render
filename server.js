@@ -170,10 +170,10 @@ app.post('/register', async (req, res) => {
         });
         console.log('Loyverse response:', loyverseResponse.data);
 
-        // Generar QR Code con el ID de cliente de Loyverse
-        const qrCodeData = loyverseResponse.data.id;
+        // Generar QR Code con el formato específico de Loyverse
+        const qrCodeData = `loyverse://customers/${loyverseResponse.data.id}`;
         const qrCode = await QRCode.toDataURL(qrCodeData);
-        console.log('QR Code generated with Loyverse ID:', qrCodeData);
+        console.log('QR Code generated with Loyverse format:', qrCodeData);
 
         // Crear pase de Google Wallet
         let walletUrl = null;

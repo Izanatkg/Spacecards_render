@@ -4,13 +4,24 @@ const { GoogleAuth } = require('google-auth-library');
 const ISSUER_ID = '3388000000022884108';
 const CLASS_ID = `${ISSUER_ID}.pokemon_loyalty_card`;
 
-// Usar el client_id del archivo de credenciales
-const serviceAccount = require('./puntos-loyvers-2b7433c755f0.json');
+let credentials;
+try {
+    // Intenta usar las credenciales de las variables de entorno primero
+    if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+        credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+    } else {
+        // Fallback para desarrollo local
+        credentials = require('./puntos-loyvers-2b7433c755f0.json');
+    }
+} catch (error) {
+    console.error('Error loading Google credentials:', error);
+    throw error;
+}
 
 // Configurar autenticación usando credenciales de servicio
 const auth = new GoogleAuth({
     scopes: ['https://www.googleapis.com/auth/wallet_object.issuer'],
-    keyFile: './puntos-loyvers-2b7433c755f0.json'
+    credentials
 });
 
 const loyaltyClass = {

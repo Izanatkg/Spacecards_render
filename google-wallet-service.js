@@ -1,18 +1,75 @@
+require('dotenv').config();
 const axios = require('axios');
-const { auth, ISSUER_ID, CLASS_ID, CLIENT_ID, loyaltyClass } = require('./google-wallet-config');
+const { GoogleAuth } = require('google-auth-library');
+const { JWT } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 
 class GoogleWalletService {
     constructor() {
+        let credentials;
+        try {
+            // Intenta usar las credenciales de las variables de entorno primero
+            if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+                credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+            } else {
+                // Fallback para desarrollo local
+                credentials = require('./puntos-loyvers-2b7433c755f0.json');
+            }
+        } catch (error) {
+            console.error('Error loading Google credentials:', error);
+            throw error;
+        }
+
+        this.auth = new GoogleAuth({
+            credentials,
+            scopes: ['https://www.googleapis.com/auth/wallet_object.issuer']
+        });
+
+        this.client = this.auth.getClient();
+        this.httpClient = new JWT({
+            email: credentials.client_email,
+            key: credentials.private_key,
+            scopes: ['https://www.googleapis.com/auth/wallet_object.issuer']
+        });
+
         this.baseUrl = 'https://walletobjects.googleapis.com/walletobjects/v1';
-        this.serviceAccount = require(path.join(__dirname, 'puntos-loyvers-2b7433c755f0.json'));
+        this.ISSUER_ID = process.env.ISSUER_ID;
+        this.CLASS_ID = process.env.CLASS_ID;
+        this.CLIENT_ID = process.env.CLIENT_ID;
+        this.loyaltyClass = {
+            "issuerName": process.env.ISSUER_NAME,
+            "programName": process.env.PROGRAM_NAME,
+            "programLogo": {
+                "sourceUri": {
+                    "uri": process.env.PROGRAM_LOGO
+                }
+            },
+            "rewardsTier": "REWARDS_TIER_UNSPECIFIED",
+            "reviewStatus": "REVIEW_STATUS_UNSPECIFIED",
+            "id": this.CLASS_ID,
+            "version": "1",
+            "hexBackgroundColor": process.env.HEX_BACKGROUND_COLOR,
+            "hexFontColor": process.env.HEX_FONT_COLOR,
+            "provider": process.env.PROVIDER,
+            "infoModuleData": {
+                "labelValueRows": [
+                    {
+                        "columns": [
+                            {
+                                "label": "Programa de lealtad",
+                                "value": process.env.PROGRAM_NAME
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
     }
 
     async getAuthToken() {
-        const client = await auth.getClient();
-        const token = await client.getAccessToken();
-        return token.token;
+        const token = await this.client.getAccessToken();
+        return token;
     }
 
     async createLoyaltyClass() {
@@ -23,7 +80,7 @@ class GoogleWalletService {
             // Primero intentar obtener la clase existente
             try {
                 const response = await axios.get(
-                    `${this.baseUrl}/loyaltyClass/${CLASS_ID}`,
+                    `${this.baseUrl}/loyaltyClass/${this.CLASS_ID}`,
                     {
                         headers: { 
                             'Authorization': `Bearer ${token}`
@@ -43,7 +100,7 @@ class GoogleWalletService {
             // Crear la clase de lealtad
             const response = await axios.post(
                 `${this.baseUrl}/loyaltyClass`,
-                loyaltyClass,
+                this.loyaltyClass,
                 {
                     headers: { 
                         'Authorization': `Bearer ${token}`,
@@ -62,12 +119,12 @@ class GoogleWalletService {
     async createLoyaltyObject(userId, customerInfo) {
         try {
             console.log('Creating loyalty object for user:', userId, 'with info:', customerInfo);
-            const objectId = `${ISSUER_ID}.user-${userId}`;
+            const objectId = `${this.ISSUER_ID}.user-${userId}`;
 
             // Crear el objeto de lealtad
             const loyaltyObject = {
                 id: objectId,
-                classId: CLASS_ID,
+                classId: this.CLASS_ID,
                 state: 'ACTIVE',
                 accountId: customerInfo.email,
                 accountName: customerInfo.name,
@@ -123,19 +180,19 @@ class GoogleWalletService {
 
             // Generar URL para agregar a Google Wallet
             const claims = {
-                iss: this.serviceAccount.client_email,
+                iss: credentials.client_email,
                 aud: 'google',
                 origins: [],
                 typ: 'savetowallet',
                 payload: {
                     loyaltyObjects: [{
                         id: objectId,
-                        classId: CLASS_ID
+                        classId: this.CLASS_ID
                     }]
                 }
             };
 
-            const token_jwt = jwt.sign(claims, this.serviceAccount.private_key, { algorithm: 'RS256' });
+            const token_jwt = jwt.sign(claims, credentials.private_key, { algorithm: 'RS256' });
             return `https://pay.google.com/gp/v/save/${token_jwt}`;
 
         } catch (error) {
@@ -165,7 +222,7 @@ class GoogleWalletService {
     }
 
     async updateLoyaltyPoints(userId, newPoints) {
-        const objectId = `${ISSUER_ID}.user-${userId}`;
+        const objectId = `${this.ISSUER_ID}.user-${userId}`;
         try {
             const token = await this.getAuthToken();
             await axios.patch(

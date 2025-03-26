@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import axios from '../config/axios';
 
 const AuthContext = createContext();
 
@@ -25,9 +26,23 @@ export const AuthProvider = ({ children }) => {
         // Additional logout logic (e.g., clearing tokens)
     };
 
-    const register = async (userData) => {
+    const register = async (fullName, email, phone) => {
         try {
-            // Implement registration logic here
+            const response = await axios.post('/register', {
+                fullName,
+                email,
+                phone
+            });
+
+            // Actualizar el estado del usuario si es necesario
+            setUser({
+                id: response.data.id,
+                name: fullName,
+                email: email,
+                points: response.data.points
+            });
+
+            return response.data;
         } catch (error) {
             console.error('Registration error:', error);
             throw error;

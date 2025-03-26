@@ -1,10 +1,12 @@
 const axios = require('axios');
 const { auth, ISSUER_ID, CLASS_ID, CLIENT_ID, loyaltyClass } = require('./google-wallet-config');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 
 class GoogleWalletService {
     constructor() {
         this.baseUrl = 'https://walletobjects.googleapis.com/walletobjects/v1';
+        this.serviceAccount = require(path.join(__dirname, 'puntos-loyvers-2b7433c755f0.json'));
     }
 
     async getAuthToken() {
@@ -75,14 +77,14 @@ class GoogleWalletService {
                 },
                 loyaltyPoints: {
                     balance: {
-                        string: '0'
+                        string: customerInfo.points.toString()
                     },
-                    label: 'Puntos disponibles'
+                    label: 'PokéPuntos'
                 },
                 messages: [
                     {
                         header: '¡Bienvenido Entrenador!',
-                        body: 'Obtén 10% de descuento en tu primera compra'
+                        body: `¡Has recibido ${customerInfo.points} PokéPuntos de regalo!`
                     }
                 ]
             };
@@ -102,18 +104,26 @@ class GoogleWalletService {
                         }
                     }
                 );
-                console.log('Loyalty object created successfully');
             } catch (error) {
                 if (error.response?.status !== 409) {
                     throw error;
                 }
-                console.log('Loyalty object already exists');
+                // Si el objeto ya existe, actualizarlo
+                await axios.put(
+                    `${this.baseUrl}/loyaltyObject/${objectId}`,
+                    loyaltyObject,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
             }
 
-            // Generar JWT para el pase
-            const serviceAccount = require('./puntos-loyvers-2b7433c755f0.json');
+            // Generar URL para agregar a Google Wallet
             const claims = {
-                iss: serviceAccount.client_email,
+                iss: this.serviceAccount.client_email,
                 aud: 'google',
                 origins: [],
                 typ: 'savetowallet',
@@ -125,17 +135,31 @@ class GoogleWalletService {
                 }
             };
 
-            const signedJwt = jwt.sign(claims, serviceAccount.private_key, {
-                algorithm: 'RS256',
-                expiresIn: '1h'
-            });
-
-            const saveUrl = `https://pay.google.com/gp/v/save/${signedJwt}`;
-            console.log('Generated save URL:', saveUrl);
-            return saveUrl;
+            const token_jwt = jwt.sign(claims, this.serviceAccount.private_key, { algorithm: 'RS256' });
+            return `https://pay.google.com/gp/v/save/${token_jwt}`;
 
         } catch (error) {
-            console.error('Error creating Google Wallet pass:', error);
+            console.error('Error creating loyalty object:', error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    async createLoyaltyPass(customerData) {
+        try {
+            // Primero asegurarnos de que existe la clase de lealtad
+            await this.createLoyaltyClass();
+
+            // Luego crear el objeto de lealtad
+            const walletUrl = await this.createLoyaltyObject(customerData.customerId, {
+                email: customerData.email || `user-${customerData.customerId}@pokepuntos.com`,
+                name: customerData.name,
+                reference_id: customerData.customerId,
+                points: customerData.points || 0
+            });
+
+            return walletUrl;
+        } catch (error) {
+            console.error('Error creating loyalty pass:', error);
             throw error;
         }
     }

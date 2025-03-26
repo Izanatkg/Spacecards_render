@@ -12,9 +12,10 @@ import {
     Link
 } from '@mui/material';
 import { QRCodeSVG } from 'qrcode.react';
-import axios from '../config/axios';
+import { useAuth } from '../contexts/AuthContext';
 
 const Register = () => {
+    const { register } = useAuth();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -39,14 +40,9 @@ const Register = () => {
         setError('');
 
         try {
-            const response = await axios.post('/register', {
-                fullName: formData.name,
-                email: formData.email,
-                phone: formData.phone
-            });
-
-            console.log('Registration response:', response.data);
-            setRegistrationData(response.data);
+            const response = await register(formData.name, formData.email, formData.phone);
+            console.log('Registration response:', response);
+            setRegistrationData(response);
             setSuccess(true);
             setShowSnackbar(true);
         } catch (error) {
@@ -220,17 +216,17 @@ const Register = () => {
                                     }
                                 }}
                             >
-                                ¡Felicidades, Entrenador! {registrationData.welcomeBonus && `(${registrationData.welcomeBonus})`}
+                                ¡Felicidades, Entrenador! {registrationData?.welcomeBonus}
                             </Alert>
                             <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, color: '#1a237e' }}>
-                                ID de Entrenador: {registrationData.user.customerId}
+                                ID de Entrenador: {registrationData?.id}
                             </Typography>
-                            {registrationData.qrCode && (
+                            {registrationData?.qrCode && (
                                 <Box sx={{ mb: 2 }}>
                                     <img src={registrationData.qrCode} alt="QR Code" style={{ width: '200px', height: '200px' }} />
                                 </Box>
                             )}
-                            {registrationData.walletUrl && (
+                            {registrationData?.walletUrl && (
                                 <Box sx={{ mt: 3, mb: 2, textAlign: 'center' }}>
                                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                         <a 
@@ -268,8 +264,8 @@ const Register = () => {
                                     </Box>
                                 </Box>
                             )}
-                            <Typography variant="body1" sx={{ mt: 2, color: 'success.main', fontWeight: 'bold' }}>
-                                {registrationData.welcomeBonus && `¡Bienvenido! Tienes ${registrationData.welcomeBonus}!`}
+                            <Typography variant="body1" sx={{ mt: 2, color: '#4a90e2', fontWeight: 'bold' }}>
+                                {registrationData?.points && `¡Tienes ${registrationData.points} PokéPuntos!`}
                             </Typography>
                             <Button
                                 variant="outlined"
@@ -284,32 +280,18 @@ const Register = () => {
                                     }
                                 }}
                             >
-                                Registrar otro Entrenador
+                                Registrar otro entrenador
                             </Button>
                         </Box>
                     )}
                 </Paper>
             </Container>
-
             <Snackbar
                 open={showSnackbar}
                 autoHideDuration={6000}
                 onClose={() => setShowSnackbar(false)}
-            >
-                <Alert 
-                    severity="success" 
-                    sx={{ 
-                        width: '100%',
-                        backgroundColor: '#4caf50',
-                        color: 'white',
-                        '& .MuiAlert-icon': {
-                            color: 'white'
-                        }
-                    }}
-                >
-                    ¡Bienvenido al mundo Pokémon!
-                </Alert>
-            </Snackbar>
+                message="¡Registro exitoso!"
+            />
         </Box>
     );
 };

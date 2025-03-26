@@ -249,27 +249,58 @@ class GoogleWalletService {
         }
     }
 
-    async updateLoyaltyPoints(userId, newPoints) {
-        const objectId = `${this.ISSUER_ID}.user-${userId}`;
+    async updateLoyaltyPoints(userId, points) {
         try {
+            console.log('Updating points for user:', userId, 'to:', points);
+            const objectId = `${this.ISSUER_ID}.user-${userId}`;
+
+            // Obtener token de autenticación
             const token = await this.getAuthToken();
-            await axios.patch(
-                `${this.baseUrl}/loyaltyObject/${objectId}`,
-                {
-                    loyaltyPoints: {
-                        balance: {
-                            string: newPoints.toString()
+
+            try {
+                // Obtener el objeto existente
+                const existingObject = await axios.get(
+                    `${this.baseUrl}/loyaltyObject/${objectId}`,
+                    {
+                        headers: { 
+                            'Authorization': `Bearer ${token}`
                         }
                     }
-                },
-                {
-                    headers: { Authorization: `Bearer ${token}` }
+                );
+
+                // Actualizar solo los puntos
+                const updatedObject = {
+                    ...existingObject.data,
+                    loyaltyPoints: {
+                        balance: {
+                            int: points
+                        },
+                        label: 'Puntos'
+                    }
+                };
+
+                // Actualizar el objeto
+                await axios.patch(
+                    `${this.baseUrl}/loyaltyObject/${objectId}`,
+                    updatedObject,
+                    {
+                        headers: { 
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+                console.log('Successfully updated points in Google Wallet');
+                return true;
+            } catch (error) {
+                if (error.response?.status === 404) {
+                    console.error('Loyalty object not found:', objectId);
                 }
-            );
-            return true;
+                throw error;
+            }
         } catch (error) {
-            console.error('Error updating loyalty points:', error.response?.data || error.message);
-            return false;
+            console.error('Error updating loyalty points:', error.response?.data || error);
+            throw error;
         }
     }
 }

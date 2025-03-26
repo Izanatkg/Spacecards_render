@@ -441,6 +441,87 @@ app.post('/webhook/loyverse', async (req, res) => {
     }
 });
 
+// Función para obtener los puntos actuales de un cliente en Loyverse
+async function getLoyversePointsForSync(customerCode) {
+    try {
+        const response = await axios.get(`https://api.loyverse.com/v1.0/customers`, {
+            headers: {
+                'Authorization': `Bearer ${process.env.LOYVERSE_TOKEN}`
+            },
+            params: {
+                customer_code: customerCode
+            }
+        });
+
+        if (response.data.customers && response.data.customers.length > 0) {
+            return response.data.customers[0].total_points || 0;
+        }
+        return 0;
+    } catch (error) {
+        console.error('Error getting Loyverse points:', error);
+        return 0;
+    }
+}
+
+// Ruta para actualizar los puntos de un cliente
+app.get('/api/update-points/:customerCode', async (req, res) => {
+    try {
+        const { customerCode } = req.params;
+        console.log('Updating points for customer:', customerCode);
+
+        // Obtener puntos actuales de Loyverse
+        const currentPoints = await getLoyversePointsForSync(customerCode);
+        console.log('Current points in Loyverse:', currentPoints);
+
+        // Actualizar pase de Google Wallet
+        try {
+            await googleWalletService.updateLoyaltyPoints(customerCode, currentPoints);
+            console.log('Updated Google Wallet points successfully');
+        } catch (error) {
+            console.error('Error updating Google Wallet:', error);
+        }
+
+        res.json({ success: true, points: currentPoints });
+    } catch (error) {
+        console.error('Error in update-points:', error);
+        res.status(500).json({ success: false, error: 'Error updating points' });
+    }
+});
+
+// Iniciar el polling de puntos para todos los clientes
+async function startPointsPollingForAll() {
+    try {
+        // Obtener todos los clientes
+        const response = await axios.get('https://api.loyverse.com/v1.0/customers', {
+            headers: {
+                'Authorization': `Bearer ${process.env.LOYVERSE_TOKEN}`
+            }
+        });
+
+        const customers = response.data.customers || [];
+        
+        // Actualizar puntos cada 5 minutos para cada cliente
+        setInterval(async () => {
+            for (const customer of customers) {
+                if (customer.customer_code) {
+                    try {
+                        const currentPoints = await getLoyversePointsForSync(customer.customer_code);
+                        await googleWalletService.updateLoyaltyPoints(customer.customer_code, currentPoints);
+                        console.log(`Updated points for ${customer.customer_code}: ${currentPoints}`);
+                    } catch (error) {
+                        console.error(`Error updating points for ${customer.customer_code}:`, error);
+                    }
+                }
+            }
+        }, 5 * 60 * 1000); // 5 minutos
+    } catch (error) {
+        console.error('Error starting points polling:', error);
+    }
+}
+
+// Iniciar el polling cuando arranque el servidor
+startPointsPollingForAll();
+
 // Handle React routing, return all requests to React app
 app.get('*', function(req, res, next) {
     // Skip API routes

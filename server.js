@@ -158,8 +158,8 @@ app.post('/register', async (req, res) => {
             phone_number: phone,
             total_points: parseInt(process.env.WELCOME_POINTS || '100', 10),
             loyalty_program_enabled: true,
-            reference_id: customerCode,
-            note: `Customer ID: ${customerCode}`
+            code: customerCode, // Cambiado de reference_id a code
+            note: 'Registrado desde la web' // Nota actualizada
         };
 
         console.log('Creating customer in Loyverse:', customerData);
@@ -182,7 +182,7 @@ app.post('/register', async (req, res) => {
                 name,
                 email,
                 phone,
-                loyverse_id: qrCodeData
+                loyverse_id: loyverseResponse.data.id
             });
             console.log('Wallet URL generated:', walletUrl);
         } catch (walletError) {

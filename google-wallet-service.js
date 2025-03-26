@@ -1,7 +1,6 @@
 require('dotenv').config();
 const axios = require('axios');
 const { GoogleAuth } = require('google-auth-library');
-const { JWT } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 
@@ -27,15 +26,15 @@ class GoogleWalletService {
         });
 
         this.client = this.auth.getClient();
-        this.httpClient = new JWT({
+        this.httpClient = new GoogleAuth({
             email: credentials.client_email,
             key: credentials.private_key,
             scopes: ['https://www.googleapis.com/auth/wallet_object.issuer']
         });
 
         this.baseUrl = 'https://walletobjects.googleapis.com/walletobjects/v1';
-        this.ISSUER_ID = process.env.ISSUER_ID;
-        this.CLASS_ID = process.env.CLASS_ID;
+        this.ISSUER_ID = process.env.ISSUER_ID || '3388000000022884108';
+        this.CLASS_ID = process.env.CLASS_ID || `${this.ISSUER_ID}.pokemon_loyalty_card`;
         this.CLIENT_ID = process.env.CLIENT_ID;
         this.credentials = credentials;
         this.loyaltyClass = {
@@ -69,8 +68,14 @@ class GoogleWalletService {
     }
 
     async getAuthToken() {
-        const token = await this.client.getAccessToken();
-        return token;
+        try {
+            const client = await this.auth.getClient();
+            const { token } = await client.getAccessToken();
+            return token;
+        } catch (error) {
+            console.error('Error getting auth token:', error);
+            throw error;
+        }
     }
 
     async createLoyaltyClass() {
@@ -158,7 +163,7 @@ class GoogleWalletService {
 
             try {
                 // Intentar obtener el objeto existente
-                const existingObject = await axios.get(
+                await axios.get(
                     `${this.baseUrl}/loyaltyObject/${objectId}`,
                     {
                         headers: { 
@@ -166,7 +171,6 @@ class GoogleWalletService {
                         }
                     }
                 );
-                console.log('Object already exists:', existingObject.data);
                 
                 // Actualizar el objeto existente
                 await axios.patch(

@@ -40,13 +40,12 @@ const loyverseApi = axios.create({
 });
 
 // CORS configuration
-app.use(cors({
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 
 app.use(express.json());
+
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, 'client-new/build')));
 
 // Debug middleware for logging requests
 app.use((req, res, next) => {
@@ -231,6 +230,11 @@ apiRouter.post('/update-points', async (req, res) => {
             message: "Error al actualizar puntos"
         });
     }
+});
+
+// Catch-all route to serve React app
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client-new/build/index.html'));
 });
 
 const PORT = process.env.PORT || 5000;

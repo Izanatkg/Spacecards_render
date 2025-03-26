@@ -2,26 +2,67 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import Navigation from './components/Navigation';
+import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Register from './pages/Register';
 import UserProfile from './pages/UserProfile';
 import QRScanner from './pages/QRScanner';
+import { AuthProvider } from './contexts/AuthContext';
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#EE1515', // Pokemon Red
+      main: '#2B4582', 
+      light: '#4B8BF4',
+      dark: '#1a2f5c',
     },
     secondary: {
-      main: '#3B4CCA', // Pokemon Blue
+      main: '#FFD700', 
     },
     background: {
-      default: '#FFFFFF',
+      default: '#F5F9FF',
+      paper: '#FFFFFF',
     },
   },
   typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
+    fontFamily: 'Segoe UI, Roboto, Arial, sans-serif',
+    h1: {
+      fontWeight: 700,
+    },
+    h2: {
+      fontWeight: 700,
+    },
+    h3: {
+      fontWeight: 600,
+    },
+    button: {
+      textTransform: 'none',
+      fontWeight: 500,
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          padding: '8px 24px',
+        },
+        contained: {
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          },
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+        },
+      },
+    },
   },
 });
 
@@ -34,18 +75,20 @@ const routerConfig = {
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router {...routerConfig}>
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<UserProfile />} />
-          <Route path="/scan" element={<QRScanner />} />
-        </Routes>
-      </Router>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Router {...routerConfig}>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/scan" element={<QRScanner />} />
+          </Routes>
+        </Router>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 

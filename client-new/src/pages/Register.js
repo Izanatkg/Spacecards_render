@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../contexts/AuthContext';
+import axios from 'axios';
 
 const Register = () => {
     const { register } = useAuth();
@@ -36,16 +37,26 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
         setError('');
-
+        setLoading(true);
         try {
+            console.log('Submitting registration data:', formData);
             const response = await register(formData.name, formData.email, formData.phone);
             console.log('Registration response:', response);
-            setRegistrationData(response);
-            setSuccess(true);
-            setShowSnackbar(true);
+            
+            if (response) {
+                setRegistrationData({
+                    customer_code: response.customer_code,
+                    qrCode: response.qrCode,
+                    walletUrl: response.walletUrl
+                });
+                setSuccess(true);
+                setShowSnackbar(true);
+            } else {
+                setError('Error en el registro');
+            }
         } catch (error) {
+            console.error('Error during registration:', error);
             setError(error.response?.data?.message || 'Error en el registro');
         } finally {
             setLoading(false);
@@ -217,33 +228,34 @@ const Register = () => {
                                     )}
                                     {registrationData.walletUrl && (
                                         <Box sx={{ mt: 2, mb: 2 }}>
-                                            <a 
+                                            <Button
+                                                component="a"
                                                 href={registrationData.walletUrl}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                style={{ textDecoration: 'none' }}
+                                                variant="contained"
+                                                sx={{ 
+                                                    backgroundColor: '#000000',
+                                                    '&:hover': {
+                                                        backgroundColor: '#333333'
+                                                    }
+                                                }}
+                                                startIcon={
+                                                    <img 
+                                                        src="https://fonts.gstatic.com/s/i/productlogos/wallet/v8/192px.svg"
+                                                        alt=""
+                                                        style={{ height: '24px' }}
+                                                    />
+                                                }
                                             >
-                                                <Button
-                                                    variant="contained"
-                                                    color="primary"
-                                                    startIcon={<img src="/google-wallet.png" alt="" style={{ height: '24px' }} />}
-                                                    sx={{ 
-                                                        backgroundColor: '#000000',
-                                                        '&:hover': {
-                                                            backgroundColor: '#333333'
-                                                        }
-                                                    }}
-                                                >
-                                                    Agregar a Google Wallet
-                                                </Button>
-                                            </a>
+                                                Agregar a Google Wallet
+                                            </Button>
                                         </Box>
                                     )}
                                     <Box sx={{ mt: 2 }}>
                                         <Button
                                             variant="outlined"
                                             onClick={() => setRegistrationData(null)}
-                                            sx={{ mt: 1 }}
                                         >
                                             Registrar otro entrenador
                                         </Button>

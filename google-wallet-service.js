@@ -37,6 +37,7 @@ class GoogleWalletService {
         this.ISSUER_ID = process.env.ISSUER_ID;
         this.CLASS_ID = process.env.CLASS_ID;
         this.CLIENT_ID = process.env.CLIENT_ID;
+        this.credentials = credentials;
         this.loyaltyClass = {
             "issuerName": process.env.ISSUER_NAME,
             "programName": process.env.PROGRAM_NAME,
@@ -130,57 +131,77 @@ class GoogleWalletService {
                 accountName: customerInfo.name,
                 barcode: {
                     type: 'QR_CODE',
-                    value: customerInfo.reference_id
+                    value: userId,
+                    alternateText: userId
                 },
                 loyaltyPoints: {
                     balance: {
-                        string: customerInfo.points.toString()
+                        int: parseInt(process.env.WELCOME_POINTS || '100', 10)
                     },
-                    label: 'PokéPuntos'
+                    label: 'Puntos'
                 },
-                messages: [
+                textModulesData: [
                     {
-                        header: '¡Bienvenido Entrenador!',
-                        body: `¡Has recibido ${customerInfo.points} PokéPuntos de regalo!`
+                        header: 'ID de Entrenador',
+                        body: userId
+                    },
+                    {
+                        header: 'Nombre',
+                        body: customerInfo.name
                     }
                 ]
             };
 
             // Obtener token de autenticación
             const token = await this.getAuthToken();
+            console.log('Got auth token');
 
-            // Crear el objeto en Google Wallet
             try {
-                await axios.post(
-                    `${this.baseUrl}/loyaltyObject`,
-                    loyaltyObject,
+                // Intentar obtener el objeto existente
+                const existingObject = await axios.get(
+                    `${this.baseUrl}/loyaltyObject/${objectId}`,
                     {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
+                        headers: { 
+                            'Authorization': `Bearer ${token}`
                         }
                     }
                 );
-            } catch (error) {
-                if (error.response?.status !== 409) {
-                    throw error;
-                }
-                // Si el objeto ya existe, actualizarlo
-                await axios.put(
+                console.log('Object already exists:', existingObject.data);
+                
+                // Actualizar el objeto existente
+                await axios.patch(
                     `${this.baseUrl}/loyaltyObject/${objectId}`,
                     loyaltyObject,
                     {
-                        headers: {
+                        headers: { 
                             'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json'
                         }
                     }
                 );
+                console.log('Updated existing object');
+            } catch (error) {
+                if (error.response?.status === 404) {
+                    // Crear nuevo objeto si no existe
+                    await axios.post(
+                        `${this.baseUrl}/loyaltyObject`,
+                        loyaltyObject,
+                        {
+                            headers: { 
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        }
+                    );
+                    console.log('Created new object');
+                } else {
+                    throw error;
+                }
             }
 
             // Generar URL para agregar a Google Wallet
             const claims = {
-                iss: credentials.client_email,
+                iss: this.credentials.client_email,
                 aud: 'google',
                 origins: [],
                 typ: 'savetowallet',
@@ -192,11 +213,13 @@ class GoogleWalletService {
                 }
             };
 
-            const token_jwt = jwt.sign(claims, credentials.private_key, { algorithm: 'RS256' });
-            return `https://pay.google.com/gp/v/save/${token_jwt}`;
+            const token_jwt = jwt.sign(claims, this.credentials.private_key, { algorithm: 'RS256' });
+            const walletUrl = `https://pay.google.com/gp/v/save/${token_jwt}`;
+            console.log('Generated wallet URL:', walletUrl);
+            return walletUrl;
 
         } catch (error) {
-            console.error('Error creating loyalty object:', error.response?.data || error.message);
+            console.error('Error in createLoyaltyObject:', error.response?.data || error);
             throw error;
         }
     }

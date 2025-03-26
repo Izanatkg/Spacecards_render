@@ -205,69 +205,49 @@ const Register = () => {
                         </>
                     ) : (
                         <Box sx={{ mt: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            {success && registrationData && (
+                            {registrationData && (
                                 <Box sx={{ mt: 3, textAlign: 'center' }}>
-                                    <Alert severity="success" sx={{ mb: 3 }}>
-                                        {registrationData.message}
-                                    </Alert>
-                                    
-                                    {registrationData.customer.qrCode && (
-                                        <Box sx={{ mb: 3 }}>
-                                            <Typography variant="h6" gutterBottom>
-                                                ID de Entrenador: {registrationData.customer.customer_code}
-                                            </Typography>
-                                            <Box
-                                                component="img"
-                                                src={registrationData.customer.qrCode}
-                                                alt="QR Code"
-                                                sx={{
-                                                    maxWidth: '200px',
-                                                    width: '100%',
-                                                    height: 'auto',
-                                                    display: 'block',
-                                                    margin: '0 auto'
-                                                }}
-                                            />
+                                    <Typography variant="h6">
+                                        ID de Entrenador: {registrationData.customer_code}
+                                    </Typography>
+                                    {registrationData.qrCode && (
+                                        <Box sx={{ mt: 2, mb: 2 }}>
+                                            <img src={registrationData.qrCode} alt="QR Code" style={{ maxWidth: '200px' }} />
                                         </Box>
                                     )}
-
                                     {registrationData.walletUrl && (
-                                        <Box sx={{ mt: 3, mb: 2, textAlign: 'center' }}>
-                                            <Button
-                                                component="a"
+                                        <Box sx={{ mt: 2, mb: 2 }}>
+                                            <a 
                                                 href={registrationData.walletUrl}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                sx={{
-                                                    backgroundColor: '#000',
-                                                    color: '#fff',
-                                                    display: 'inline-flex',
-                                                    alignItems: 'center',
-                                                    padding: '8px 16px',
-                                                    borderRadius: '4px',
-                                                    textDecoration: 'none',
-                                                    '&:hover': {
-                                                        backgroundColor: '#333'
-                                                    }
-                                                }}
+                                                style={{ textDecoration: 'none' }}
                                             >
-                                                <img 
-                                                    src="https://fonts.gstatic.com/s/i/productlogos/wallet/v8/192px.svg"
-                                                    alt="Google Wallet"
-                                                    style={{ height: '24px', marginRight: '8px' }}
-                                                />
-                                                Agregar a Google Wallet
-                                            </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    startIcon={<img src="/google-wallet.png" alt="" style={{ height: '24px' }} />}
+                                                    sx={{ 
+                                                        backgroundColor: '#000000',
+                                                        '&:hover': {
+                                                            backgroundColor: '#333333'
+                                                        }
+                                                    }}
+                                                >
+                                                    Agregar a Google Wallet
+                                                </Button>
+                                            </a>
                                         </Box>
                                     )}
-
-                                    <Button
-                                        variant="outlined"
-                                        onClick={handleReset}
-                                        sx={{ mt: 2 }}
-                                    >
-                                        Registrar otro entrenador
-                                    </Button>
+                                    <Box sx={{ mt: 2 }}>
+                                        <Button
+                                            variant="outlined"
+                                            onClick={() => setRegistrationData(null)}
+                                            sx={{ mt: 1 }}
+                                        >
+                                            Registrar otro entrenador
+                                        </Button>
+                                    </Box>
                                 </Box>
                             )}
                         </Box>

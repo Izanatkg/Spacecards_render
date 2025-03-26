@@ -136,8 +136,8 @@ class GoogleWalletService {
                 accountName: customerInfo.name,
                 barcode: {
                     type: 'QR_CODE',
-                    value: userId,
-                    alternateText: userId
+                    value: customerInfo.loyverse_id,
+                    alternateText: customerInfo.loyverse_id
                 },
                 loyaltyPoints: {
                     balance: {

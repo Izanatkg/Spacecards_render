@@ -113,7 +113,7 @@ async function addPointsToCustomer(customerId, points) {
         console.log('Updated customer data:', customerResponse.data);
         return customerResponse.data;
     } catch (error) {
-        console.error('Error adding points:', error.response?.data || error.message);
+        console.error('Error adding points:', error.response?.data || error);
         
         // Si falla, intentar con el endpoint de puntos directo
         try {
@@ -158,6 +158,7 @@ app.post('/register', async (req, res) => {
             phone_number: phone,
             total_points: parseInt(process.env.WELCOME_POINTS || '100', 10),
             loyalty_program_enabled: true,
+            reference_id: customerCode,
             note: `Customer ID: ${customerCode}`
         };
 
@@ -169,9 +170,10 @@ app.post('/register', async (req, res) => {
         });
         console.log('Loyverse response:', loyverseResponse.data);
 
-        // Generar QR Code
-        const qrCode = await QRCode.toDataURL(customerCode);
-        console.log('QR Code generated');
+        // Generar QR Code con el ID de cliente de Loyverse
+        const qrCodeData = loyverseResponse.data.id;
+        const qrCode = await QRCode.toDataURL(qrCodeData);
+        console.log('QR Code generated with Loyverse ID:', qrCodeData);
 
         // Crear pase de Google Wallet
         let walletUrl = null;
@@ -179,7 +181,8 @@ app.post('/register', async (req, res) => {
             walletUrl = await googleWalletService.createLoyaltyObject(customerCode, {
                 name,
                 email,
-                phone
+                phone,
+                loyverse_id: qrCodeData
             });
             console.log('Wallet URL generated:', walletUrl);
         } catch (walletError) {

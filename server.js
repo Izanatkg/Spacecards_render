@@ -18,16 +18,29 @@ const WELCOME_POINTS = 100; // Puntos de bienvenida
 // Función para obtener y actualizar el contador de clientes
 async function getNextCustomerId() {
     try {
-        // Intentar leer el archivo
-        const counter = await fs.readFile(COUNTER_FILE, 'utf8');
+        let counter;
+        try {
+            // Intentar leer el archivo
+            counter = await fs.readFile(COUNTER_FILE, 'utf8');
+        } catch (error) {
+            // Si el archivo no existe, crear con valor inicial
+            await fs.writeFile(COUNTER_FILE, '0');
+            counter = '0';
+        }
+
         const nextId = parseInt(counter) + 1;
+        // Asegurarnos que el ID tenga 6 dígitos
+        const paddedId = nextId.toString().padStart(6, '0');
+        
         // Guardar el nuevo contador
         await fs.writeFile(COUNTER_FILE, nextId.toString());
-        return nextId;
+        
+        return paddedId;
     } catch (error) {
-        // Si el archivo no existe, comenzar desde 600000
-        await fs.writeFile(COUNTER_FILE, '600001');
-        return 600000;
+        console.error('Error managing customer counter:', error);
+        // En caso de error, generar un ID basado en timestamp
+        const timestamp = Date.now().toString().slice(-6);
+        return timestamp;
     }
 }
 
@@ -41,7 +54,10 @@ const loyverseApi = axios.create({
 });
 
 // CORS configuration
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}));
 
 app.use(express.json());
 
@@ -50,10 +66,7 @@ app.use(express.static(path.join(__dirname, 'client-new/build')));
 
 // Debug middleware for logging requests
 app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-    if (req.method === 'POST') {
-        console.log('Request body:', req.body);
-    }
+    console.log(`${req.method} ${req.path}`, req.body);
     next();
 });
 
@@ -118,122 +131,88 @@ async function addPointsToCustomer(customerId, points) {
     }
 }
 
-// Routes
+// Configurar rutas API
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
-apiRouter.post('/register', async (req, res) => {
+// Ruta de registro
+app.post('/register', async (req, res) => {
     try {
-        const { fullName, email, phone } = req.body;
+        const { name, email, phone } = req.body;
+        console.log('Received registration request:', { name, email, phone });
 
         // Validar datos requeridos
-        if (!fullName || !email || !phone) {
+        if (!name || !email || !phone) {
             return res.status(400).json({
                 success: false,
                 message: 'Todos los campos son requeridos'
             });
         }
 
-        // Verificar si el usuario ya existe en Loyverse
-        try {
-            const existingCustomers = await loyverseApi.get('/customers', {
-                params: {
-                    email: email
-                }
-            });
+        // Generar ID de cliente
+        const customerCode = await getNextCustomerId();
+        console.log('Generated customer code:', customerCode);
 
-            if (existingCustomers.data.customers && existingCustomers.data.customers.length > 0) {
-                const existingCustomer = existingCustomers.data.customers[0];
-                
-                // Generar código QR
-                const qrCode = await QRCode.toDataURL(existingCustomer.customer_code);
-
-                // Crear o actualizar pase de Google Wallet
-                const walletUrl = await googleWalletService.createLoyaltyPass({
-                    customerId: existingCustomer.customer_code,
-                    name: existingCustomer.name,
-                    email: existingCustomer.email,
-                    points: existingCustomer.total_points || 0
-                });
-
-                return res.json({
-                    success: true,
-                    id: existingCustomer.customer_code,
-                    name: existingCustomer.name,
-                    email: existingCustomer.email,
-                    points: existingCustomer.total_points || 0,
-                    qrCode: qrCode,
-                    walletUrl: walletUrl,
-                    welcomeBonus: 'Usuario ya registrado'
-                });
-            }
-        } catch (error) {
-            console.error('Error checking existing customer:', error);
-        }
-
-        // Si el usuario no existe, continuar con el registro
-        const customerId = await getNextCustomerId();
-        const customerIdStr = customerId.toString();
-
+        // Crear cliente en Loyverse
         const loyverseCustomerData = {
-            name: fullName,
+            name: name,
             email: email,
             phone_number: phone,
-            customer_code: customerIdStr,
-            note: "Registrado desde el Sistema de lealtad",
+            total_points: WELCOME_POINTS,
             loyalty_program_enabled: true,
-            total_points: WELCOME_POINTS // Intentar establecer los puntos directamente
+            customer_code: customerCode
         };
 
         try {
-            // Crear cliente en Loyverse
+            console.log('Creating customer in Loyverse:', loyverseCustomerData);
             const loyverseResponse = await loyverseApi.post('/customers', loyverseCustomerData);
             console.log('Loyverse customer created:', loyverseResponse.data);
 
-            let updatedCustomer;
-            if (!loyverseResponse.data.total_points || loyverseResponse.data.total_points < WELCOME_POINTS) {
-                // Si los puntos no se establecieron en la creación, intentar añadirlos después
-                updatedCustomer = await addPointsToCustomer(loyverseResponse.data.id, WELCOME_POINTS);
-                console.log('Customer after points update:', updatedCustomer);
-            } else {
-                updatedCustomer = loyverseResponse.data;
-            }
+            // Generar código QR
+            const qrCode = await QRCode.toDataURL(customerCode);
 
-            const qrCode = await QRCode.toDataURL(customerIdStr);
-
-            const walletUrl = await googleWalletService.createLoyaltyPass({
-                customerId: customerIdStr,
-                name: fullName,
-                email: email,
-                points: updatedCustomer.total_points || WELCOME_POINTS
-            });
-
-            res.json({
-                success: true,
-                id: customerIdStr,
-                name: fullName,
-                email: email,
-                points: updatedCustomer.total_points || WELCOME_POINTS,
-                qrCode: qrCode,
-                walletUrl: walletUrl,
-                welcomeBonus: `¡Bienvenido! Has recibido ${WELCOME_POINTS} PokéPuntos de regalo`
-            });
-
-        } catch (error) {
-            console.error('Error creating customer:', error.response?.data || error.message);
-            if (error.response?.data?.errors?.[0]?.code === 'INVALID_VALUE') {
-                res.status(400).json({
-                    success: false,
-                    message: 'El correo electrónico ya está registrado'
+            // Crear pase de Google Wallet
+            try {
+                const walletUrl = await googleWalletService.createLoyaltyPass({
+                    customerId: customerCode,
+                    name: name,
+                    email: email,
+                    points: WELCOME_POINTS
                 });
-            } else {
-                res.status(500).json({
-                    success: false,
-                    message: 'Error al crear el cliente en Loyverse'
+
+                // Iniciar el polling de puntos para el nuevo usuario
+                startPointsPolling(customerCode);
+
+                res.json({
+                    success: true,
+                    message: '¡Registro exitoso!',
+                    customer: {
+                        ...loyverseResponse.data,
+                        customer_code: customerCode,
+                        qrCode
+                    },
+                    walletUrl: walletUrl
+                });
+            } catch (walletError) {
+                console.error('Error creating wallet pass:', walletError);
+                // Aún enviar respuesta exitosa, solo sin URL de wallet
+                res.json({
+                    success: true,
+                    message: '¡Registro exitoso! (Sin Google Wallet)',
+                    customer: {
+                        ...loyverseResponse.data,
+                        customer_code: customerCode,
+                        qrCode
+                    }
                 });
             }
+        } catch (loyverseError) {
+            console.error('Error creating customer in Loyverse:', loyverseError.response?.data || loyverseError);
+            res.status(400).json({
+                success: false,
+                message: loyverseError.response?.data?.message || 'Error al crear cliente en Loyverse'
+            });
         }
-
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).json({
@@ -242,6 +221,96 @@ apiRouter.post('/register', async (req, res) => {
         });
     }
 });
+
+let lastKnownPoints = {};
+
+// Objeto para almacenar los intervalos de polling por usuario
+const pollingIntervals = {};
+
+// Función para obtener puntos actuales de Loyverse
+async function getLoyversePoints(customerId) {
+    try {
+        console.log('Getting points for customer:', customerId);
+        const response = await loyverseApi.get(`/customers/${customerId}`);
+        console.log('Loyverse response:', response.data);
+        return response.data.total_points || 0;
+    } catch (error) {
+        console.error('Error getting Loyverse points:', error.response?.data || error);
+        // Si el error es 400, intentar buscar por customer_code
+        if (error.response?.status === 400) {
+            try {
+                const searchResponse = await loyverseApi.get('/customers', {
+                    params: {
+                        customer_code: customerId
+                    }
+                });
+                if (searchResponse.data.customers && searchResponse.data.customers.length > 0) {
+                    const customer = searchResponse.data.customers[0];
+                    return customer.total_points || 0;
+                }
+            } catch (searchError) {
+                console.error('Error searching customer:', searchError.response?.data || searchError);
+            }
+        }
+        return null;
+    }
+}
+
+// Función para actualizar el pase de Google Wallet
+async function updateWalletPass(customerId) {
+    try {
+        const points = await getLoyversePoints(customerId);
+        if (points === null) return;
+
+        // Solo actualizar si los puntos han cambiado
+        if (lastKnownPoints[customerId] !== points) {
+            console.log(`Points changed for customer ${customerId}: ${lastKnownPoints[customerId]} -> ${points}`);
+            lastKnownPoints[customerId] = points;
+            
+            // Obtener información del cliente
+            let customer;
+            try {
+                const response = await loyverseApi.get('/customers', {
+                    params: {
+                        customer_code: customerId
+                    }
+                });
+                if (response.data.customers && response.data.customers.length > 0) {
+                    customer = response.data.customers[0];
+                } else {
+                    throw new Error('Customer not found');
+                }
+            } catch (error) {
+                console.error('Error getting customer info:', error);
+                return;
+            }
+
+            console.log('Updating Google Wallet pass with new points:', points);
+
+            // Crear el objeto de lealtad actualizado
+            await googleWalletService.createLoyaltyObject(customerId, {
+                email: customer.email,
+                name: customer.name,
+                reference_id: customer.customer_code,
+                points: points
+            });
+        }
+    } catch (error) {
+        console.error('Error updating wallet pass:', error);
+    }
+}
+
+// Iniciar el polling de puntos para cada usuario
+function startPointsPolling(customerId) {
+    // Si ya existe un intervalo para este usuario, detenerlo
+    if (pollingIntervals[customerId]) {
+        clearInterval(pollingIntervals[customerId]);
+    }
+    
+    // Iniciar nuevo intervalo
+    console.log(`Starting points polling for customer ${customerId}`);
+    pollingIntervals[customerId] = setInterval(() => updateWalletPass(customerId), 5000); // Revisar cada 5 segundos
+}
 
 // Generate QR Code endpoint
 apiRouter.get('/generate-qr', async (req, res) => {
@@ -284,7 +353,7 @@ apiRouter.post('/update-points', async (req, res) => {
 });
 
 // Endpoint para actualizar puntos
-app.post('/api/points/update', async (req, res) => {
+apiRouter.post('/points/update', async (req, res) => {
     try {
         const { customer_id } = req.body;
 
@@ -330,7 +399,7 @@ app.post('/api/points/update', async (req, res) => {
 });
 
 // Webhook para escuchar cambios de puntos en Loyverse
-app.post('/api/loyverse/webhook', async (req, res) => {
+apiRouter.post('/loyverse/webhook', async (req, res) => {
     try {
         const { type, data } = req.body;
 
@@ -364,9 +433,35 @@ app.post('/api/loyverse/webhook', async (req, res) => {
     }
 });
 
-// Catch-all route to serve React app
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client-new/build/index.html'));
+// Ruta para actualizar puntos desde Loyverse
+app.post('/webhook/loyverse', async (req, res) => {
+    try {
+        const { event_type, data } = req.body;
+        console.log('Received webhook:', event_type, data);
+        
+        // Si es un evento de puntos o transacción
+        if (event_type === 'customer_points_changed' || event_type === 'receipt_created') {
+            const customerId = data.customer_id || data.customer?.id;
+            if (customerId) {
+                // Asegurarse de que el polling está activo para este usuario
+                startPointsPolling(customerId);
+                // Actualizar el pase inmediatamente
+                await updateWalletPass(customerId);
+            }
+        }
+        
+        res.sendStatus(200);
+    } catch (error) {
+        console.error('Error processing webhook:', error);
+        res.sendStatus(500);
+    }
+});
+
+// Handle React routing, return all requests to React app
+app.get('*', function(req, res, next) {
+    // Skip API routes
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(__dirname, 'client-new/build', 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;

@@ -5,8 +5,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Register from './pages/Register';
-import UserProfile from './pages/UserProfile';
-import QRScanner from './pages/QRScanner';
 import { AuthProvider } from './contexts/AuthContext';
 
 const theme = createTheme({
@@ -66,25 +64,16 @@ const theme = createTheme({
   },
 });
 
-const routerConfig = {
-  future: {
-    v7_startTransition: true,
-    v7_relativeSplatPath: true
-  }
-};
-
 function App() {
   return (
     <AuthProvider>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Router {...routerConfig}>
+        <Router>
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/profile" element={<UserProfile />} />
-            <Route path="/scan" element={<QRScanner />} />
           </Routes>
         </Router>
       </ThemeProvider>

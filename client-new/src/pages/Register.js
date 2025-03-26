@@ -205,83 +205,71 @@ const Register = () => {
                         </>
                     ) : (
                         <Box sx={{ mt: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <Alert 
-                                severity="success" 
-                                sx={{ 
-                                    mb: 4,
-                                    backgroundColor: '#4caf50',
-                                    color: 'white',
-                                    '& .MuiAlert-icon': {
-                                        color: 'white'
-                                    }
-                                }}
-                            >
-                                ¡Felicidades, Entrenador! {registrationData?.welcomeBonus}
-                            </Alert>
-                            <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2, color: '#1a237e' }}>
-                                ID de Entrenador: {registrationData?.id}
-                            </Typography>
-                            {registrationData?.qrCode && (
-                                <Box sx={{ mb: 2 }}>
-                                    <img src={registrationData.qrCode} alt="QR Code" style={{ width: '200px', height: '200px' }} />
-                                </Box>
-                            )}
-                            {registrationData?.walletUrl && (
-                                <Box sx={{ mt: 3, mb: 2, textAlign: 'center' }}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                        <a 
-                                            href={registrationData.walletUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            style={{ 
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                textDecoration: 'none',
-                                                backgroundColor: '#000000',
-                                                color: '#FFFFFF',
-                                                padding: '8px 16px',
-                                                borderRadius: '24px',
-                                                gap: '8px',
-                                                height: '48px'
-                                            }}
-                                        >
-                                            <img
-                                                src="https://fonts.gstatic.com/s/i/productlogos/wallet/v8/192px.svg"
-                                                alt="Google Wallet"
-                                                style={{
-                                                    height: '24px',
-                                                    width: 'auto'
+                            {success && registrationData && (
+                                <Box sx={{ mt: 3, textAlign: 'center' }}>
+                                    <Alert severity="success" sx={{ mb: 3 }}>
+                                        {registrationData.message}
+                                    </Alert>
+                                    
+                                    {registrationData.customer.qrCode && (
+                                        <Box sx={{ mb: 3 }}>
+                                            <Typography variant="h6" gutterBottom>
+                                                ID de Entrenador: {registrationData.customer.customer_code}
+                                            </Typography>
+                                            <Box
+                                                component="img"
+                                                src={registrationData.customer.qrCode}
+                                                alt="QR Code"
+                                                sx={{
+                                                    maxWidth: '200px',
+                                                    width: '100%',
+                                                    height: 'auto',
+                                                    display: 'block',
+                                                    margin: '0 auto'
                                                 }}
                                             />
-                                            <span style={{
-                                                fontFamily: 'Roboto, Arial, sans-serif',
-                                                fontSize: '16px',
-                                                fontWeight: '500'
-                                            }}>
-                                                Add to Google Wallet
-                                            </span>
-                                        </a>
-                                    </Box>
+                                        </Box>
+                                    )}
+
+                                    {registrationData.walletUrl && (
+                                        <Box sx={{ mt: 3, mb: 2, textAlign: 'center' }}>
+                                            <Button
+                                                component="a"
+                                                href={registrationData.walletUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                sx={{
+                                                    backgroundColor: '#000',
+                                                    color: '#fff',
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    padding: '8px 16px',
+                                                    borderRadius: '4px',
+                                                    textDecoration: 'none',
+                                                    '&:hover': {
+                                                        backgroundColor: '#333'
+                                                    }
+                                                }}
+                                            >
+                                                <img 
+                                                    src="https://fonts.gstatic.com/s/i/productlogos/wallet/v8/192px.svg"
+                                                    alt="Google Wallet"
+                                                    style={{ height: '24px', marginRight: '8px' }}
+                                                />
+                                                Agregar a Google Wallet
+                                            </Button>
+                                        </Box>
+                                    )}
+
+                                    <Button
+                                        variant="outlined"
+                                        onClick={handleReset}
+                                        sx={{ mt: 2 }}
+                                    >
+                                        Registrar otro entrenador
+                                    </Button>
                                 </Box>
                             )}
-                            <Typography variant="body1" sx={{ mt: 2, color: '#4a90e2', fontWeight: 'bold' }}>
-                                {registrationData?.points && `¡Tienes ${registrationData.points} PokéPuntos!`}
-                            </Typography>
-                            <Button
-                                variant="outlined"
-                                onClick={handleReset}
-                                sx={{ 
-                                    mt: 3,
-                                    borderColor: '#4a90e2',
-                                    color: '#4a90e2',
-                                    '&:hover': {
-                                        borderColor: '#357abd',
-                                        backgroundColor: 'rgba(74, 144, 226, 0.1)'
-                                    }
-                                }}
-                            >
-                                Registrar otro entrenador
-                            </Button>
                         </Box>
                     )}
                 </Paper>

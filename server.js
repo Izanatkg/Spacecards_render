@@ -136,72 +136,75 @@ const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
 // Ruta de registro
-app.post('/register', async (req, res) => {
+app.post('/api/register', async (req, res) => {
     try {
         const { name, email, phone } = req.body;
+        console.log('Registering new customer:', { name, email, phone });
 
-        if (!name || !email || !phone) {
-            return res.status(400).json({
-                success: false,
-                error: 'Todos los campos son requeridos'
-            });
-        }
-
-        // Generar el código de cliente
+        // Generar código de cliente único
         const customerCode = await getNextCustomerId();
         console.log('Generated customer code:', customerCode);
-        
-        // Registrar en Loyverse
+
+        // Datos del cliente para Loyverse
         const customerData = {
             name: name,
             email: email,
             phone_number: phone,
             total_points: parseInt(process.env.WELCOME_POINTS || '100', 10),
             loyalty_program_enabled: true,
-            customer_code: customerCode, 
+            customer_code: customerCode,
             note: 'Registrado desde la web'
         };
 
-        console.log('Creating customer in Loyverse:', customerData);
-        const loyverseResponse = await axios.post('https://api.loyverse.com/v1.0/customers', customerData, {
-            headers: {
-                'Authorization': `Bearer ${process.env.LOYVERSE_TOKEN}`
+        // Registrar en Loyverse
+        const response = await axios.post(
+            'https://api.loyverse.com/v1.0/customers',
+            customerData,
+            {
+                headers: {
+                    'Authorization': `Bearer ${process.env.LOYVERSE_TOKEN}`
+                }
             }
-        });
-        console.log('Loyverse response:', loyverseResponse.data);
+        );
 
-        // Generar QR Code con el formato específico de Loyverse
-        const qrCodeData = customerCode; 
-        const qrCode = await QRCode.toDataURL(qrCodeData);
-        console.log('QR Code generated with customer code:', qrCodeData);
+        const loyverseCustomer = response.data;
+        console.log('Customer registered in Loyverse:', loyverseCustomer);
 
         // Crear pase de Google Wallet
-        let walletUrl = null;
         try {
-            walletUrl = await googleWalletService.createLoyaltyObject(customerCode, {
-                name,
-                email,
-                phone,
-                loyverse_id: customerCode 
+            const walletUrl = await googleWalletService.createLoyaltyObject(
+                customerCode,
+                {
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    loyverse_id: customerCode,
+                    points: parseInt(process.env.WELCOME_POINTS || '100', 10)
+                }
+            );
+            console.log('Google Wallet pass created, URL:', walletUrl);
+
+            // Devolver respuesta con URL de Google Wallet
+            res.json({
+                success: true,
+                message: 'Cliente registrado exitosamente',
+                customer: loyverseCustomer,
+                walletUrl: walletUrl
             });
-            console.log('Wallet URL generated:', walletUrl);
         } catch (walletError) {
-            console.error('Error creating wallet pass:', walletError);
-            // No fallamos el registro si falla Google Wallet
+            console.error('Error creating Google Wallet pass:', walletError);
+            // Aún devolvemos éxito pero sin URL de wallet
+            res.json({
+                success: true,
+                message: 'Cliente registrado exitosamente (sin Google Wallet)',
+                customer: loyverseCustomer
+            });
         }
-
-        res.json({
-            success: true,
-            customer_code: customerCode,
-            qrCode: qrCode,
-            walletUrl: walletUrl
-        });
-
     } catch (error) {
         console.error('Error in registration:', error.response?.data || error);
         res.status(500).json({
             success: false,
-            error: error.response?.data?.message || error.message || 'Error en el registro'
+            error: 'Error al registrar el cliente'
         });
     }
 });

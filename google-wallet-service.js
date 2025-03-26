@@ -15,6 +15,7 @@ class GoogleWalletService {
                 // Fallback para desarrollo local
                 credentials = require('./puntos-loyvers-2b7433c755f0.json');
             }
+            console.log('Loaded Google credentials successfully');
         } catch (error) {
             console.error('Error loading Google credentials:', error);
             throw error;
@@ -65,6 +66,7 @@ class GoogleWalletService {
                 ]
             }
         };
+        console.log('Google Wallet service initialized');
     }
 
     async getAuthToken() {
@@ -154,7 +156,18 @@ class GoogleWalletService {
                         header: 'Nombre',
                         body: customerInfo.name
                     }
-                ]
+                ],
+                hexBackgroundColor: '#FF5733',
+                logo: {
+                    sourceUri: {
+                        uri: 'https://i.imgur.com/FpqHJGe.png'
+                    }
+                },
+                headerImage: {
+                    sourceUri: {
+                        uri: 'https://i.imgur.com/FpqHJGe.png'
+                    }
+                }
             };
 
             // Obtener token de autenticación

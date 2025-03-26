@@ -64,10 +64,14 @@ const Register = () => {
     };
 
     const handleReset = () => {
-        setFormData({ name: '', email: '', phone: '' });
-        setSuccess(false);
         setRegistrationData(null);
+        setFormData({
+            name: '',
+            email: '',
+            phone: ''
+        });
         setError('');
+        setSuccess(false);
     };
 
     return (
@@ -130,90 +134,71 @@ const Register = () => {
                     />
 
                     {!success ? (
-                        <>
+                        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
                             <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#1a237e', fontWeight: 'bold', mb: 3 }}>
                                 Registro de Entrenador
                             </Typography>
-
-                            <form onSubmit={handleSubmit}>
-                                <TextField
-                                    fullWidth
-                                    label="Nombre completo"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    margin="normal"
-                                    required
-                                    sx={{ 
-                                        '& .MuiOutlinedInput-root': {
-                                            '&:hover fieldset': {
-                                                borderColor: '#4a90e2',
-                                            },
-                                        },
-                                    }}
-                                />
-                                <TextField
-                                    fullWidth
-                                    label="Email"
-                                    name="email"
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    margin="normal"
-                                    required
-                                    sx={{ 
-                                        '& .MuiOutlinedInput-root': {
-                                            '&:hover fieldset': {
-                                                borderColor: '#4a90e2',
-                                            },
-                                        },
-                                    }}
-                                />
-                                <TextField
-                                    fullWidth
-                                    label="Teléfono"
-                                    name="phone"
-                                    type="tel"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    margin="normal"
-                                    required
-                                    inputProps={{ pattern: "[0-9]{10}" }}
-                                    helperText="10 dígitos"
-                                    sx={{ 
-                                        '& .MuiOutlinedInput-root': {
-                                            '&:hover fieldset': {
-                                                borderColor: '#4a90e2',
-                                            },
-                                        },
-                                    }}
-                                />
-                                {error && (
-                                    <Alert severity="error" sx={{ mt: 2 }}>
-                                        {error}
-                                    </Alert>
-                                )}
-                                <Button
-                                    fullWidth
-                                    type="submit"
-                                    variant="contained"
-                                    sx={{ 
-                                        mt: 3,
-                                        background: 'linear-gradient(45deg, #4a90e2 30%, #357abd 90%)',
-                                        color: 'white',
-                                        fontWeight: 'bold',
-                                        fontSize: '1.1rem',
-                                        py: 1.5,
-                                        '&:hover': {
-                                            background: 'linear-gradient(45deg, #357abd 30%, #2c6aa1 90%)',
-                                        }
-                                    }}
-                                    disabled={loading}
-                                >
-                                    {loading ? <CircularProgress size={24} /> : '¡Comenzar Aventura!'}
-                                </Button>
-                            </form>
-                        </>
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="name"
+                                label="Nombre Completo"
+                                name="name"
+                                autoComplete="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                autoFocus
+                            />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="email"
+                                label="Correo Electrónico"
+                                name="email"
+                                autoComplete="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                            />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="phone"
+                                label="Teléfono"
+                                name="phone"
+                                autoComplete="tel"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                inputProps={{ pattern: "[0-9]{10}" }}
+                                helperText="10 dígitos"
+                            />
+                            {error && (
+                                <Alert severity="error" sx={{ mt: 2 }}>
+                                    {error}
+                                </Alert>
+                            )}
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                sx={{ 
+                                    mt: 3,
+                                    background: 'linear-gradient(45deg, #4a90e2 30%, #357abd 90%)',
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                    fontSize: '1.1rem',
+                                    py: 1.5,
+                                    '&:hover': {
+                                        background: 'linear-gradient(45deg, #357abd 30%, #2c6aa1 90%)',
+                                    }
+                                }}
+                                disabled={loading}
+                            >
+                                {loading ? <CircularProgress size={24} /> : '¡Comenzar Aventura!'}
+                            </Button>
+                        </Box>
                     ) : (
                         <Box sx={{ mt: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                             {registrationData && (
@@ -255,7 +240,7 @@ const Register = () => {
                                     <Box sx={{ mt: 2 }}>
                                         <Button
                                             variant="outlined"
-                                            onClick={() => setRegistrationData(null)}
+                                            onClick={handleReset}
                                         >
                                             Registrar otro entrenador
                                         </Button>

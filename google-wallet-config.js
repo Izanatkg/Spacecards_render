@@ -1,16 +1,15 @@
 require('dotenv').config();
 const { GoogleAuth } = require('google-auth-library');
 
-const ISSUER_ID = '3388000000022884108';
-const CLASS_ID = `${ISSUER_ID}.pokemon_loyalty_card`;
+// Usar variables de entorno o valores por defecto
+const ISSUER_ID = process.env.ISSUER_ID || '3388000000022884108';
+const CLASS_ID = process.env.CLASS_ID || `${ISSUER_ID}.pokemon_loyalty_card`;
 
 let credentials;
 try {
-    // Intenta usar las credenciales de las variables de entorno primero
     if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
         credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
     } else {
-        // Fallback para desarrollo local
         credentials = require('./puntos-loyvers-2b7433c755f0.json');
     }
 } catch (error) {
@@ -26,15 +25,15 @@ const auth = new GoogleAuth({
 
 const loyaltyClass = {
     id: CLASS_ID,
-    issuerName: 'Mamitas Tepic',
-    programName: 'Programa de Lealtad Pokémon',
+    issuerName: process.env.ISSUER_NAME || 'Mamitas Tepic',
+    programName: process.env.PROGRAM_NAME || 'Programa de Lealtad Pokémon',
     programLogo: {
         sourceUri: {
-            uri: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png'
+            uri: process.env.PROGRAM_LOGO || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png'
         }
     },
     reviewStatus: 'ACTIVE',
-    hexBackgroundColor: '#FF5733',
+    hexBackgroundColor: process.env.HEX_BACKGROUND_COLOR || '#FF5733',
     heroImage: {
         sourceUri: {
             uri: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png'
@@ -56,5 +55,6 @@ module.exports = {
     auth,
     ISSUER_ID,
     CLASS_ID,
-    loyaltyClass
+    loyaltyClass,
+    credentials
 };

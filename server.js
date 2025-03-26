@@ -140,8 +140,16 @@ app.post('/register', async (req, res) => {
     try {
         const { name, email, phone } = req.body;
 
+        if (!name || !email || !phone) {
+            return res.status(400).json({
+                success: false,
+                error: 'Todos los campos son requeridos'
+            });
+        }
+
         // Generar el código de cliente
         const customerCode = await getNextCustomerId();
+        console.log('Generated customer code:', customerCode);
         
         // Registrar en Loyverse
         const customerData = {
@@ -153,23 +161,31 @@ app.post('/register', async (req, res) => {
             note: `Customer ID: ${customerCode}`
         };
 
-        const response = await axios.post('https://api.loyverse.com/v1.0/customers', customerData, {
+        console.log('Creating customer in Loyverse:', customerData);
+        const loyverseResponse = await axios.post('https://api.loyverse.com/v1.0/customers', customerData, {
             headers: {
                 'Authorization': `Bearer ${process.env.LOYVERSE_TOKEN}`
             }
         });
+        console.log('Loyverse response:', loyverseResponse.data);
 
         // Generar QR Code
         const qrCode = await QRCode.toDataURL(customerCode);
+        console.log('QR Code generated');
 
         // Crear pase de Google Wallet
-        const walletUrl = await googleWalletService.createLoyaltyObject(customerCode, {
-            name,
-            email,
-            phone
-        });
-
-        console.log('Wallet URL generated:', walletUrl);
+        let walletUrl = null;
+        try {
+            walletUrl = await googleWalletService.createLoyaltyObject(customerCode, {
+                name,
+                email,
+                phone
+            });
+            console.log('Wallet URL generated:', walletUrl);
+        } catch (walletError) {
+            console.error('Error creating wallet pass:', walletError);
+            // No fallamos el registro si falla Google Wallet
+        }
 
         res.json({
             success: true,
@@ -179,10 +195,10 @@ app.post('/register', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error in registration:', error);
+        console.error('Error in registration:', error.response?.data || error);
         res.status(500).json({
             success: false,
-            error: error.message
+            error: error.response?.data?.message || error.message || 'Error en el registro'
         });
     }
 });

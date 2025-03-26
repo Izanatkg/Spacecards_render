@@ -259,7 +259,7 @@ class GoogleWalletService {
 
             try {
                 // Obtener el objeto existente
-                const existingObject = await axios.get(
+                const { data: existingObject } = await axios.get(
                     `${this.baseUrl}/loyaltyObject/${objectId}`,
                     {
                         headers: { 
@@ -267,10 +267,10 @@ class GoogleWalletService {
                         }
                     }
                 );
+                console.log('Found existing loyalty object');
 
-                // Actualizar solo los puntos
-                const updatedObject = {
-                    ...existingObject.data,
+                // Crear objeto de actualización solo con los campos necesarios
+                const updateObject = {
                     loyaltyPoints: {
                         balance: {
                             int: points
@@ -282,7 +282,7 @@ class GoogleWalletService {
                 // Actualizar el objeto
                 await axios.patch(
                     `${this.baseUrl}/loyaltyObject/${objectId}`,
-                    updatedObject,
+                    updateObject,
                     {
                         headers: { 
                             'Authorization': `Bearer ${token}`,
@@ -290,11 +290,20 @@ class GoogleWalletService {
                         }
                     }
                 );
-                console.log('Successfully updated points in Google Wallet');
+                console.log('Successfully updated points in Google Wallet to:', points);
                 return true;
             } catch (error) {
                 if (error.response?.status === 404) {
-                    console.error('Loyalty object not found:', objectId);
+                    console.error('Loyalty object not found, creating new one...');
+                    // Si el objeto no existe, crearlo
+                    await this.createLoyaltyObject(userId, {
+                        name: 'Unknown',
+                        email: `user-${userId}@pokepuntos.com`,
+                        phone: '',
+                        loyverse_id: userId,
+                        points: points
+                    });
+                    return true;
                 }
                 throw error;
             }

@@ -156,7 +156,7 @@ app.post('/register', async (req, res) => {
             name: name,
             email: email,
             phone_number: phone,
-            total_points: process.env.WELCOME_POINTS || 100,
+            total_points: parseInt(process.env.WELCOME_POINTS || '100', 10),
             loyalty_program_enabled: true,
             note: `Customer ID: ${customerCode}`
         };

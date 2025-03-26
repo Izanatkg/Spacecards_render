@@ -158,8 +158,8 @@ app.post('/register', async (req, res) => {
             phone_number: phone,
             total_points: parseInt(process.env.WELCOME_POINTS || '100', 10),
             loyalty_program_enabled: true,
-            code: customerCode, // Cambiado de reference_id a code
-            note: 'Registrado desde la web' // Nota actualizada
+            customer_code: customerCode, 
+            note: 'Registrado desde la web'
         };
 
         console.log('Creating customer in Loyverse:', customerData);
@@ -171,9 +171,9 @@ app.post('/register', async (req, res) => {
         console.log('Loyverse response:', loyverseResponse.data);
 
         // Generar QR Code con el formato específico de Loyverse
-        const qrCodeData = `loyverse://customers/${loyverseResponse.data.id}`;
+        const qrCodeData = customerCode; 
         const qrCode = await QRCode.toDataURL(qrCodeData);
-        console.log('QR Code generated with Loyverse format:', qrCodeData);
+        console.log('QR Code generated with customer code:', qrCodeData);
 
         // Crear pase de Google Wallet
         let walletUrl = null;
@@ -182,7 +182,7 @@ app.post('/register', async (req, res) => {
                 name,
                 email,
                 phone,
-                loyverse_id: loyverseResponse.data.id
+                loyverse_id: customerCode 
             });
             console.log('Wallet URL generated:', walletUrl);
         } catch (walletError) {

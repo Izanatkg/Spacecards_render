@@ -136,8 +136,8 @@ class GoogleWalletService {
                 accountName: customerInfo.name,
                 barcode: {
                     type: 'QR_CODE',
-                    value: `loyverse://customers/${customerInfo.loyverse_id}`,
-                    alternateText: customerInfo.loyverse_id
+                    value: customerInfo.customer_code,
+                    alternateText: customerInfo.customer_code
                 },
                 loyaltyPoints: {
                     balance: {
@@ -237,6 +237,7 @@ class GoogleWalletService {
             const walletUrl = await this.createLoyaltyObject(customerData.customerId, {
                 email: customerData.email || `user-${customerData.customerId}@pokepuntos.com`,
                 name: customerData.name,
+                customer_code: customerData.customer_code,
                 reference_id: customerData.customerId,
                 points: customerData.points || 0
             });

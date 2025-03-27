@@ -12,11 +12,9 @@ import {
     Link
 } from '@mui/material';
 import { QRCodeSVG } from 'qrcode.react';
-import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 
 const Register = () => {
-    const { register } = useAuth();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -25,7 +23,8 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
-    const [registrationData, setRegistrationData] = useState(null);
+    const [customerCode, setCustomerCode] = useState(null);
+    const [walletUrl, setWalletUrl] = useState(null);
     const [showSnackbar, setShowSnackbar] = useState(false);
 
     const handleChange = (e) => {
@@ -35,36 +34,32 @@ const Register = () => {
         });
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
+    const onSubmit = async (data) => {
         setLoading(true);
+        setError(null);
+        console.log('Submitting registration data:', data);
+
         try {
-            console.log('Submitting registration data:', formData);
-            const response = await register(formData.name, formData.email, formData.phone);
-            console.log('Registration response:', response);
+            const response = await axios.post('/api/register', data);
+            console.log('Registration successful:', response.data);
             
-            if (response) {
-                setRegistrationData({
-                    customer_code: response.customer_code,
-                    qrCode: response.qrCode,
-                    walletUrl: response.walletUrl
-                });
+            if (response.data.success) {
                 setSuccess(true);
+                setCustomerCode(response.data.customer.customer_code);
+                setWalletUrl(response.data.walletUrl);
                 setShowSnackbar(true);
-            } else {
-                setError('Error en el registro');
             }
         } catch (error) {
             console.error('Error during registration:', error);
-            setError(error.response?.data?.message || 'Error en el registro');
+            setError('Error al registrar. Por favor intenta de nuevo.');
         } finally {
             setLoading(false);
         }
     };
 
     const handleReset = () => {
-        setRegistrationData(null);
+        setCustomerCode(null);
+        setWalletUrl(null);
         setFormData({
             name: '',
             email: '',
@@ -134,7 +129,7 @@ const Register = () => {
                     />
 
                     {!success ? (
-                        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                        <Box component="form" onSubmit={(e) => { e.preventDefault(); onSubmit(formData); }} sx={{ mt: 3 }}>
                             <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#1a237e', fontWeight: 'bold', mb: 3 }}>
                                 Registro de Entrenador
                             </Typography>
@@ -201,21 +196,16 @@ const Register = () => {
                         </Box>
                     ) : (
                         <Box sx={{ mt: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            {registrationData && (
+                            {customerCode && (
                                 <Box sx={{ mt: 3, textAlign: 'center' }}>
                                     <Typography variant="h6">
-                                        ID de Entrenador: {registrationData.customer_code}
+                                        ID de Entrenador: {customerCode}
                                     </Typography>
-                                    {registrationData.qrCode && (
-                                        <Box sx={{ mt: 2, mb: 2 }}>
-                                            <img src={registrationData.qrCode} alt="QR Code" style={{ maxWidth: '200px' }} />
-                                        </Box>
-                                    )}
-                                    {registrationData.walletUrl && (
+                                    {walletUrl && (
                                         <Box sx={{ mt: 2, mb: 2 }}>
                                             <Button
                                                 component="a"
-                                                href={registrationData.walletUrl}
+                                                href={walletUrl}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 variant="contained"

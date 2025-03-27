@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext();
@@ -13,17 +13,13 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-
     const register = async (name, email, phone) => {
         try {
-            const response = await axios.post(`${API_URL}/register`, {
+            const response = await axios.post('/api/register', {
                 name,
                 email,
                 phone
             });
-            setUser(response.data);
             return response.data;
         } catch (error) {
             console.error('Error during registration:', error);
@@ -32,10 +28,6 @@ export function AuthProvider({ children }) {
     };
 
     const value = {
-        user,
-        setUser,
-        loading,
-        setLoading,
         register
     };
 

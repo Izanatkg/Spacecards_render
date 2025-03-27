@@ -141,13 +141,13 @@ app.use('/api', apiRouter);
 app.post('/api/register', async (req, res) => {
     try {
         const { name, email, phone } = req.body;
-        console.log('Registering new customer:', { name, email, phone });
+        console.log('Received registration request:', { name, email, phone });
 
-        // Generar código de cliente único
+        // Generar customer_code
         const customerCode = await getNextCustomerId();
         console.log('Generated customer code:', customerCode);
 
-        // Datos del cliente para Loyverse
+        // Crear cliente en Loyverse
         const customerData = {
             name: name,
             email: email,
@@ -158,55 +158,32 @@ app.post('/api/register', async (req, res) => {
             note: 'Registrado desde la web'
         };
 
-        // Registrar en Loyverse
-        const response = await axios.post(
-            'https://api.loyverse.com/v1.0/customers',
-            customerData,
-            {
-                headers: {
-                    'Authorization': `Bearer ${process.env.LOYVERSE_TOKEN}`
-                }
-            }
-        );
-
-        const loyverseCustomer = response.data;
-        console.log('Customer registered in Loyverse:', loyverseCustomer);
+        const customer = await createCustomerInLoyverse(customerData);
+        console.log('Customer created in Loyverse:', customer);
 
         // Crear pase de Google Wallet
-        try {
-            const walletUrl = await googleWalletService.createLoyaltyObject(
-                customerCode,
-                {
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    loyverse_id: customerCode,
-                    points: parseInt(process.env.WELCOME_POINTS || '100', 10)
-                }
-            );
-            console.log('Google Wallet pass created, URL:', walletUrl);
+        const walletUrl = await googleWalletService.createLoyaltyObject({
+            id: customerCode,
+            name: name,
+            email: email,
+            points: customerData.total_points
+        });
+        console.log('Google Wallet URL generated:', walletUrl);
 
-            // Devolver respuesta con URL de Google Wallet
-            res.json({
-                success: true,
-                message: 'Cliente registrado exitosamente',
-                customer: loyverseCustomer,
-                walletUrl: walletUrl
-            });
-        } catch (walletError) {
-            console.error('Error creating Google Wallet pass:', walletError);
-            // Aún devolvemos éxito pero sin URL de wallet
-            res.json({
-                success: true,
-                message: 'Cliente registrado exitosamente (sin Google Wallet)',
-                customer: loyverseCustomer
-            });
+        if (!walletUrl) {
+            throw new Error('Error al generar el pase de Google Wallet');
         }
+
+        res.json({
+            success: true,
+            customer: customer,
+            walletUrl: walletUrl
+        });
     } catch (error) {
-        console.error('Error in registration:', error.response?.data || error);
+        console.error('Error in registration:', error);
         res.status(500).json({
             success: false,
-            error: 'Error al registrar el cliente'
+            error: error.message || 'Error en el registro'
         });
     }
 });

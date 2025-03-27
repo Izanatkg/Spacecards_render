@@ -70,6 +70,11 @@ const Register = () => {
             if (response.data.success) {
                 const code = response.data.customer.customer_code;
                 
+                // Asegurarnos de que tenemos la URL de Google Wallet
+                if (!response.data.walletUrl) {
+                    throw new Error('No se recibió la URL de Google Wallet');
+                }
+                
                 // Actualizar estados en orden
                 setCustomerCode(code);
                 setWalletUrl(response.data.walletUrl);
@@ -82,7 +87,7 @@ const Register = () => {
             }
         } catch (error) {
             console.error('Error during registration:', error);
-            setError('Error al registrar. Por favor intenta de nuevo.');
+            setError(error.message || 'Error al registrar. Por favor intenta de nuevo.');
         } finally {
             setLoading(false);
         }
@@ -243,58 +248,55 @@ const Register = () => {
                         </Button>
                     </Box>
                 ) : (
-                    <Box sx={{ mt: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        {customerCode && (
-                            <Box sx={{ mt: 3, textAlign: 'center' }}>
-                                <Typography variant="h6" gutterBottom>
-                                    ID de Entrenador: {customerCode}
-                                </Typography>
+                    <Box sx={{ mt: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                        <Typography variant="h6" gutterBottom>
+                            ID de Entrenador: {customerCode}
+                        </Typography>
 
-                                {points !== null && (
-                                    <Typography variant="h6" gutterBottom sx={{ color: '#4caf50' }}>
-                                        Puntos actuales: {points}
-                                    </Typography>
-                                )}
+                        {points !== null && (
+                            <Typography variant="h6" gutterBottom sx={{ color: '#4caf50' }}>
+                                Puntos actuales: {points}
+                            </Typography>
+                        )}
 
-                                <Box sx={{ mt: 2, mb: 4 }}>
-                                    <QRCodeSVG 
-                                        value={customerCode}
-                                        size={200}
-                                        level="H"
-                                        includeMargin={true}
-                                    />
-                                </Box>
+                        <Box sx={{ mt: 2, mb: 4 }}>
+                            <QRCodeSVG 
+                                value={customerCode}
+                                size={200}
+                                level="H"
+                                includeMargin={true}
+                            />
+                        </Box>
 
-                                {walletUrl && (
-                                    <Box sx={{ mt: 2, mb: 2 }}>
-                                        <Button
-                                            component="a"
-                                            href={walletUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            variant="contained"
-                                            color="primary"
-                                            sx={{
-                                                backgroundColor: '#4285f4',
-                                                '&:hover': {
-                                                    backgroundColor: '#3367d6'
-                                                }
-                                            }}
-                                        >
-                                            Agregar a Google Wallet
-                                        </Button>
-                                    </Box>
-                                )}
-
+                        {walletUrl && (
+                            <Box sx={{ mt: 2, mb: 2, width: '100%', display: 'flex', justifyContent: 'center' }}>
                                 <Button
-                                    onClick={handleReset}
-                                    variant="outlined"
-                                    sx={{ mt: 2 }}
+                                    component="a"
+                                    href={walletUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{
+                                        backgroundColor: '#4285f4',
+                                        '&:hover': {
+                                            backgroundColor: '#3367d6'
+                                        },
+                                        mb: 2
+                                    }}
                                 >
-                                    Registrar otro entrenador
+                                    Agregar a Google Wallet
                                 </Button>
                             </Box>
                         )}
+
+                        <Button
+                            onClick={handleReset}
+                            variant="outlined"
+                            sx={{ mt: 2 }}
+                        >
+                            Registrar otro entrenador
+                        </Button>
                     </Box>
                 )}
             </Paper>

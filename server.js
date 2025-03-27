@@ -137,14 +137,53 @@ async function addPointsToCustomer(customerId, points) {
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
+// Función para crear cliente en Loyverse
+async function createCustomerInLoyverse(customerData) {
+    try {
+        console.log('Creating customer in Loyverse:', customerData);
+        const response = await axios.post(
+            'https://api.loyverse.com/v1.0/customers',
+            customerData,
+            {
+                headers: {
+                    'Authorization': `Bearer ${process.env.LOYVERSE_TOKEN}`
+                }
+            }
+        );
+        console.log('Loyverse response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error creating customer in Loyverse:', error.response?.data || error);
+        throw new Error('Error al crear cliente en Loyverse: ' + (error.response?.data?.message || error.message));
+    }
+}
+
+// Función para generar código de cliente único
+async function generateCustomerCode() {
+    try {
+        const nextId = await getNextCustomerId();
+        const paddedId = String(nextId).padStart(6, '0');
+        console.log('Generated customer code:', paddedId);
+        return paddedId;
+    } catch (error) {
+        console.error('Error generating customer code:', error);
+        throw new Error('Error al generar código de cliente: ' + error.message);
+    }
+}
+
 // Ruta de registro
 app.post('/api/register', async (req, res) => {
     try {
         const { name, email, phone } = req.body;
+        
+        if (!name || !email || !phone) {
+            throw new Error('Nombre, email y teléfono son requeridos');
+        }
+
         console.log('Received registration request:', { name, email, phone });
 
         // Generar customer_code
-        const customerCode = await getNextCustomerId();
+        const customerCode = await generateCustomerCode();
         console.log('Generated customer code:', customerCode);
 
         // Crear cliente en Loyverse

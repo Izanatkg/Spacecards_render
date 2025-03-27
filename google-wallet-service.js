@@ -124,120 +124,68 @@ class GoogleWalletService {
         }
     }
 
-    async createLoyaltyObject(userId, customerInfo) {
+    async createLoyaltyObject({ id, name, email, points }) {
         try {
-            console.log('Creating loyalty object for user:', userId, 'with info:', customerInfo);
-            const objectId = `${this.ISSUER_ID}.user-${userId}`;
+            console.log('Creating loyalty object with:', { id, name, email, points });
+            
+            if (!id || !name || !email) {
+                throw new Error('ID, name, and email are required');
+            }
 
-            // Crear el objeto de lealtad
+            const objectId = `${this.CLASS_ID}.${id}`;
+            console.log('Generated object ID:', objectId);
+
             const loyaltyObject = {
                 id: objectId,
                 classId: this.CLASS_ID,
                 state: 'ACTIVE',
-                accountId: customerInfo.email,
-                accountName: customerInfo.name,
-                barcode: {
+                accountId: email,
+                accountName: name,
+                barCode: {
                     type: 'QR_CODE',
-                    value: customerInfo.customer_code,
-                    alternateText: customerInfo.customer_code
+                    value: id,
+                    alternateText: id
                 },
                 loyaltyPoints: {
                     balance: {
-                        int: parseInt(process.env.WELCOME_POINTS || '100', 10)
+                        int: points || 0
                     },
                     label: 'Puntos'
-                },
-                textModulesData: [
-                    {
-                        header: 'ID de Entrenador',
-                        body: userId
-                    },
-                    {
-                        header: 'Nombre',
-                        body: customerInfo.name
-                    }
-                ],
-                hexBackgroundColor: '#FF5733',
-                logo: {
-                    sourceUri: {
-                        uri: 'https://i.imgur.com/FpqHJGe.png'
-                    }
-                },
-                headerImage: {
-                    sourceUri: {
-                        uri: 'https://i.imgur.com/FpqHJGe.png'
-                    }
                 }
             };
 
-            // Obtener token de autenticación
-            const token = await this.getAuthToken();
-            console.log('Got auth token');
-
+            // Verificar si el objeto ya existe
             try {
-                // Intentar obtener el objeto existente
-                await axios.get(
-                    `${this.baseUrl}/loyaltyObject/${objectId}`,
-                    {
-                        headers: { 
-                            'Authorization': `Bearer ${token}`
-                        }
-                    }
-                );
+                await this.client.loyaltyobject.get({
+                    resourceId: objectId
+                });
+                console.log('Loyalty object already exists, updating...');
                 
-                // Actualizar el objeto existente
-                await axios.patch(
-                    `${this.baseUrl}/loyaltyObject/${objectId}`,
-                    loyaltyObject,
-                    {
-                        headers: { 
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
-                console.log('Updated existing object');
+                // Actualizar objeto existente
+                await this.client.loyaltyobject.update({
+                    resourceId: objectId,
+                    requestBody: loyaltyObject
+                });
             } catch (error) {
                 if (error.response?.status === 404) {
-                    // Crear nuevo objeto si no existe
-                    await axios.post(
-                        `${this.baseUrl}/loyaltyObject`,
-                        loyaltyObject,
-                        {
-                            headers: { 
-                                'Authorization': `Bearer ${token}`,
-                                'Content-Type': 'application/json'
-                            }
-                        }
-                    );
-                    console.log('Created new object');
+                    console.log('Loyalty object does not exist, creating new one...');
+                    // Crear nuevo objeto
+                    await this.client.loyaltyobject.insert({
+                        requestBody: loyaltyObject
+                    });
                 } else {
                     throw error;
                 }
             }
 
-            // Generar URL para agregar a Google Wallet
-            const claims = {
-                iss: this.credentials.client_email,
-                aud: 'google',
-                origins: [],
-                typ: 'savetowallet',
-                payload: {
-                    loyaltyObjects: [{
-                        id: objectId,
-                        classId: this.CLASS_ID
-                    }]
-                }
-            };
-
-            const token_jwt = jwt.sign(claims, this.credentials.private_key, { algorithm: 'RS256' });
-            const walletUrl = `https://pay.google.com/gp/v/save/${token_jwt}`;
+            // Generar URL de Google Wallet
+            const walletUrl = `https://pay.google.com/gp/v/save/${objectId}`;
             console.log('Generated wallet URL:', walletUrl);
+            
             return walletUrl;
-
         } catch (error) {
-            console.error('Error in createLoyaltyObject:', error.response?.data || error);
-            throw error;
+            console.error('Error in createLoyaltyObject:', error);
+            throw new Error('Error al crear objeto de lealtad: ' + error.message);
         }
     }
 
@@ -247,13 +195,7 @@ class GoogleWalletService {
             await this.createLoyaltyClass();
 
             // Luego crear el objeto de lealtad
-            const walletUrl = await this.createLoyaltyObject(customerData.customerId, {
-                email: customerData.email || `user-${customerData.customerId}@pokepuntos.com`,
-                name: customerData.name,
-                customer_code: customerData.customer_code,
-                reference_id: customerData.customerId,
-                points: customerData.points || 0
-            });
+            const walletUrl = await this.createLoyaltyObject(customerData);
 
             return walletUrl;
         } catch (error) {
@@ -265,7 +207,7 @@ class GoogleWalletService {
     async updateLoyaltyPoints(userId, points) {
         try {
             console.log('Updating points for user:', userId, 'to:', points);
-            const objectId = `${this.ISSUER_ID}.user-${userId}`;
+            const objectId = `${this.CLASS_ID}.${userId}`;
 
             // Obtener token de autenticación
             const token = await this.getAuthToken();
@@ -309,13 +251,7 @@ class GoogleWalletService {
                 if (error.response?.status === 404) {
                     console.error('Loyalty object not found, creating new one...');
                     // Si el objeto no existe, crearlo
-                    await this.createLoyaltyObject(userId, {
-                        name: 'Unknown',
-                        email: `user-${userId}@pokepuntos.com`,
-                        phone: '',
-                        loyverse_id: userId,
-                        points: points
-                    });
+                    await this.createLoyaltyObject({ id: userId, name: 'Unknown', email: `user-${userId}@pokepuntos.com`, points });
                     return true;
                 }
                 throw error;

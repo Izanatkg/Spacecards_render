@@ -7,10 +7,12 @@ const { google } = require('googleapis');
 
 class GoogleWalletService {
     constructor() {
+        // Valores por defecto para el entorno de desarrollo
         this.CLASS_ID = process.env.CLASS_ID || '3388000000022884108.pokemon_loyalty_card';
         this.ISSUER_ID = process.env.ISSUER_ID || '3388000000022884108';
-        this.ISSUER_NAME = process.env.ISSUER_NAME || 'Pokemon Loyalty System';
+        this.ISSUER_NAME = process.env.ISSUER_NAME || 'Mamitas Tepic';
         this.PROGRAM_NAME = process.env.PROGRAM_NAME || 'Pokemon Loyalty Program';
+        this.PROGRAM_LOGO = process.env.PROGRAM_LOGO || 'https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg';
 
         // Cargar credenciales
         try {
@@ -50,6 +52,7 @@ class GoogleWalletService {
                 auth: this.auth
             });
 
+            this.credentials = credentials;
             console.log('Servicio de Google Wallet inicializado correctamente');
         } catch (error) {
             console.error('Error al inicializar el servicio de Google Wallet:', error);
@@ -58,7 +61,6 @@ class GoogleWalletService {
 
         this.baseUrl = 'https://walletobjects.googleapis.com/walletobjects/v1';
         this.CLIENT_ID = process.env.CLIENT_ID;
-        this.credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
         this.loyaltyClass = {
             "issuerName": process.env.ISSUER_NAME,
             "programName": process.env.PROGRAM_NAME,

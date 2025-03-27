@@ -17,6 +17,7 @@ const LOYVERSE_API_URL = 'https://api.loyverse.com/v1.0';
 const LOYVERSE_API_BASE = LOYVERSE_API_URL;
 const COUNTER_FILE = path.join(__dirname, 'customer_counter.txt');
 const WELCOME_POINTS = 100; // Puntos de bienvenida
+const STORE_ID = 'b7e82499-21b0-4e9d-aae5-16d90693c77a';
 
 // Función para obtener y actualizar el contador de clientes
 async function getNextCustomerId() {
@@ -101,7 +102,7 @@ async function addPointsToCustomer(customerId, points) {
         const transactionResponse = await loyverseApi.post('/merchandise_points', {
             customer_id: customerId,
             points: points,
-            store_id: 'b7e82499-21b0-4e9d-aae5-16d90693c77a',
+            store_id: STORE_ID,
             type: 'EARNING',
             description: "Puntos de bienvenida"
         });
@@ -138,22 +139,31 @@ async function addPointsToCustomer(customerId, points) {
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
+// Función para generar un código de cliente único
+async function generateUniqueCustomerCode() {
+    const prefix = 'PKM';
+    const timestamp = Date.now().toString().slice(-6);
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    return `${prefix}${timestamp}${random}`;
+}
+
 // Función para crear cliente en Loyverse
 async function createCustomerInLoyverse(customerData) {
     try {
-        console.log('Creating customer in Loyverse:', customerData);
+        // Generar un código único para el cliente
+        const customerCode = await generateUniqueCustomerCode();
+        console.log('Generated customer code:', customerCode);
         
-        // Generar código de cliente único
-        customerData.customer_code = await generateCustomerCode();
-        console.log('Generated customer code:', customerData.customer_code);
-
-        const response = await axios.post(`${LOYVERSE_API_BASE}/customers`, customerData, {
-            headers: { 
-                'Authorization': `Bearer ${LOYVERSE_TOKEN}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
+        const finalCustomerData = {
+            ...customerData,
+            store_id: STORE_ID,
+            customer_code: customerCode,
+            total_points: WELCOME_POINTS
+        };
+        
+        console.log('Creating customer in Loyverse:', finalCustomerData);
+        
+        const response = await loyverseApi.post('/customers', finalCustomerData);
         console.log('Customer created in Loyverse:', response.data);
         return response.data;
     } catch (error) {
@@ -162,81 +172,63 @@ async function createCustomerInLoyverse(customerData) {
     }
 }
 
-// Función para generar código de cliente único
-async function generateCustomerCode() {
-    try {
-        // Obtener todos los clientes
-        const response = await axios.get(`${LOYVERSE_API_BASE}/customers`, {
-            headers: { 'Authorization': `Bearer ${LOYVERSE_TOKEN}` }
-        });
-
-        // Extraer todos los códigos de cliente existentes
-        const existingCodes = response.data.customers
-            .map(c => c.customer_code)
-            .filter(code => code && code.match(/^\d{6}$/))
-            .map(code => parseInt(code));
-
-        // Encontrar el siguiente código disponible
-        let nextCode = 1;
-        while (existingCodes.includes(nextCode.toString().padStart(6, '0'))) {
-            nextCode++;
-        }
-
-        // Formatear el código con ceros a la izquierda
-        return nextCode.toString().padStart(6, '0');
-    } catch (error) {
-        console.error('Error generating customer code:', error);
-        throw new Error('Error al generar código de cliente');
-    }
-}
-
 // Ruta de registro
 app.post('/api/register', async (req, res) => {
     try {
+        console.log('Datos recibidos:', req.body);
         const { name, email, phone } = req.body;
-        
-        if (!name || !email || !phone) {
-            throw new Error('Nombre, email y teléfono son requeridos');
-        }
 
-        console.log('Received registration request:', { name, email, phone });
+        // Validar datos requeridos
+        if (!name || !email || !phone) {
+            return res.status(400).json({
+                success: false,
+                message: 'Faltan datos requeridos (nombre, email o teléfono)'
+            });
+        }
 
         // Crear cliente en Loyverse
         const customerData = {
-            name: name,
-            email: email,
-            phone_number: phone,
-            total_points: parseInt(process.env.WELCOME_POINTS || '100', 10),
-            loyalty_program_enabled: true,
-            note: 'Registrado desde la web'
+            name: name.trim(),
+            email: email.trim(),
+            phone_number: phone.trim(),
+            loyalty_program_enabled: true
         };
 
-        const customer = await createCustomerInLoyverse(customerData);
-        console.log('Customer created in Loyverse:', customer);
+        console.log('Enviando datos a Loyverse:', customerData);
+        const loyverseCustomer = await createCustomerInLoyverse(customerData);
+        console.log('Respuesta de Loyverse:', loyverseCustomer);
 
-        // Crear pase de Google Wallet
-        const walletUrl = await googleWalletService.createLoyaltyObject({
-            id: customer.customer_code,
-            name: name,
-            email: email,
-            points: customerData.total_points
-        });
-        console.log('Google Wallet URL generated:', walletUrl);
-
-        if (!walletUrl) {
-            throw new Error('Error al generar el pase de Google Wallet');
+        if (!loyverseCustomer || !loyverseCustomer.id) {
+            throw new Error('Error al crear cliente en Loyverse');
         }
 
+        // Crear objeto de Google Wallet
+        let walletUrl = null;
+        try {
+            walletUrl = await googleWalletService.createPass(loyverseCustomer.customer_code, name, WELCOME_POINTS);
+        } catch (error) {
+            console.error('Error creating Google Wallet pass:', error);
+            // No throw here, we'll continue without the wallet URL
+        }
+
+        // Enviar respuesta exitosa
         res.json({
             success: true,
-            customer: customer,
-            walletUrl: walletUrl
+            customer: {
+                id: loyverseCustomer.id,
+                code: loyverseCustomer.customer_code,
+                name,
+                email,
+                phone,
+                points: WELCOME_POINTS
+            },
+            walletUrl
         });
     } catch (error) {
-        console.error('Error in registration:', error);
+        console.error('Error en registro:', error);
         res.status(500).json({
             success: false,
-            error: error.message || 'Error en el registro'
+            message: error.message || 'Error interno del servidor'
         });
     }
 });

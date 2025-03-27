@@ -3,41 +3,46 @@ const axios = require('axios');
 const { GoogleAuth } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const { google } = require('googleapis');
 
 class GoogleWalletService {
     constructor() {
-        let credentials;
+        this.CLASS_ID = process.env.CLASS_ID || '3388000000022884108.pokemon_loyalty_card';
+        this.ISSUER_ID = process.env.ISSUER_ID || '3388000000022884108';
+        this.ISSUER_NAME = process.env.ISSUER_NAME || 'Pokemon Loyalty System';
+        this.PROGRAM_NAME = process.env.PROGRAM_NAME || 'Pokemon Loyalty Program';
+
+        // Cargar credenciales
         try {
-            // Intenta usar las credenciales de las variables de entorno primero
+            let credentials;
             if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
                 credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
             } else {
-                // Fallback para desarrollo local
                 credentials = require('./puntos-loyvers-2b7433c755f0.json');
             }
             console.log('Loaded Google credentials successfully');
+
+            // Inicializar el cliente de autenticación
+            this.auth = new GoogleAuth({
+                credentials: credentials,
+                scopes: ['https://www.googleapis.com/auth/wallet_object.issuer']
+            });
+
+            // Inicializar el cliente de la API de Google Wallet
+            this.client = google.walletobjects({
+                version: 'v1',
+                auth: this.auth
+            });
+
+            console.log('Google Wallet service initialized successfully');
         } catch (error) {
-            console.error('Error loading Google credentials:', error);
+            console.error('Error initializing Google Wallet service:', error);
             throw error;
         }
 
-        this.auth = new GoogleAuth({
-            credentials,
-            scopes: ['https://www.googleapis.com/auth/wallet_object.issuer']
-        });
-
-        this.client = this.auth.getClient();
-        this.httpClient = new GoogleAuth({
-            email: credentials.client_email,
-            key: credentials.private_key,
-            scopes: ['https://www.googleapis.com/auth/wallet_object.issuer']
-        });
-
         this.baseUrl = 'https://walletobjects.googleapis.com/walletobjects/v1';
-        this.ISSUER_ID = process.env.ISSUER_ID || '3388000000022884108';
-        this.CLASS_ID = process.env.CLASS_ID || `${this.ISSUER_ID}.pokemon_loyalty_card`;
         this.CLIENT_ID = process.env.CLIENT_ID;
-        this.credentials = credentials;
+        this.credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
         this.loyaltyClass = {
             "issuerName": process.env.ISSUER_NAME,
             "programName": process.env.PROGRAM_NAME,
@@ -141,7 +146,7 @@ class GoogleWalletService {
                 state: 'ACTIVE',
                 accountId: email,
                 accountName: name,
-                barCode: {
+                barcode: {
                     type: 'QR_CODE',
                     value: id,
                     alternateText: id
@@ -151,6 +156,27 @@ class GoogleWalletService {
                         int: points || 0
                     },
                     label: 'Puntos'
+                },
+                textModulesData: [
+                    {
+                        header: 'ID de Entrenador',
+                        body: id
+                    },
+                    {
+                        header: 'Nombre',
+                        body: name
+                    }
+                ],
+                hexBackgroundColor: '#FF5733',
+                logo: {
+                    sourceUri: {
+                        uri: 'https://i.imgur.com/FpqHJGe.png'
+                    }
+                },
+                heroImage: {
+                    sourceUri: {
+                        uri: 'https://i.imgur.com/FpqHJGe.png'
+                    }
                 }
             };
 
@@ -209,55 +235,41 @@ class GoogleWalletService {
             console.log('Updating points for user:', userId, 'to:', points);
             const objectId = `${this.CLASS_ID}.${userId}`;
 
-            // Obtener token de autenticación
-            const token = await this.getAuthToken();
-
+            // Verificar si el objeto existe
             try {
-                // Obtener el objeto existente
-                const { data: existingObject } = await axios.get(
-                    `${this.baseUrl}/loyaltyObject/${objectId}`,
-                    {
-                        headers: { 
-                            'Authorization': `Bearer ${token}`
+                await this.client.loyaltyobject.get({
+                    resourceId: objectId
+                });
+
+                // Actualizar puntos
+                await this.client.loyaltyobject.patch({
+                    resourceId: objectId,
+                    requestBody: {
+                        loyaltyPoints: {
+                            balance: {
+                                int: points
+                            }
                         }
                     }
-                );
-                console.log('Found existing loyalty object');
+                });
 
-                // Crear objeto de actualización solo con los campos necesarios
-                const updateObject = {
-                    loyaltyPoints: {
-                        balance: {
-                            int: points
-                        },
-                        label: 'Puntos'
-                    }
-                };
-
-                // Actualizar el objeto
-                await axios.patch(
-                    `${this.baseUrl}/loyaltyObject/${objectId}`,
-                    updateObject,
-                    {
-                        headers: { 
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
-                console.log('Successfully updated points in Google Wallet to:', points);
                 return true;
             } catch (error) {
                 if (error.response?.status === 404) {
                     console.error('Loyalty object not found, creating new one...');
                     // Si el objeto no existe, crearlo
-                    await this.createLoyaltyObject({ id: userId, name: 'Unknown', email: `user-${userId}@pokepuntos.com`, points });
+                    await this.createLoyaltyObject({ 
+                        id: userId, 
+                        name: 'Unknown', 
+                        email: `user-${userId}@pokepuntos.com`, 
+                        points 
+                    });
                     return true;
                 }
                 throw error;
             }
         } catch (error) {
-            console.error('Error updating loyalty points:', error.response?.data || error);
+            console.error('Error updating loyalty points:', error);
             throw error;
         }
     }

@@ -16,11 +16,27 @@ class GoogleWalletService {
         try {
             let credentials;
             if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
-                credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+                try {
+                    credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+                    console.log('Credenciales cargadas desde variable de entorno');
+                } catch (parseError) {
+                    console.error('Error al parsear GOOGLE_APPLICATION_CREDENTIALS_JSON:', parseError);
+                    throw new Error('Credenciales de Google inválidas en variable de entorno');
+                }
             } else {
-                credentials = require('./puntos-loyvers-2b7433c755f0.json');
+                try {
+                    const credentialsPath = path.join(__dirname, 'puntos-loyvers-2b7433c755f0.json');
+                    credentials = require(credentialsPath);
+                    console.log('Credenciales cargadas desde archivo:', credentialsPath);
+                } catch (fileError) {
+                    console.error('Error al cargar archivo de credenciales:', fileError);
+                    throw new Error('No se encontró el archivo de credenciales de Google');
+                }
             }
-            console.log('Loaded Google credentials successfully');
+
+            if (!credentials || !credentials.client_email || !credentials.private_key) {
+                throw new Error('Credenciales de Google incompletas o inválidas');
+            }
 
             // Inicializar el cliente de autenticación
             this.auth = new GoogleAuth({
@@ -34,9 +50,9 @@ class GoogleWalletService {
                 auth: this.auth
             });
 
-            console.log('Google Wallet service initialized successfully');
+            console.log('Servicio de Google Wallet inicializado correctamente');
         } catch (error) {
-            console.error('Error initializing Google Wallet service:', error);
+            console.error('Error al inicializar el servicio de Google Wallet:', error);
             throw error;
         }
 

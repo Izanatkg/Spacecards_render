@@ -196,23 +196,32 @@ app.post('/api/register', async (req, res) => {
         };
 
         console.log('Enviando datos a Loyverse:', customerData);
-        const loyverseCustomer = await createCustomerInLoyverse(customerData);
-        console.log('Respuesta de Loyverse:', loyverseCustomer);
+        let loyverseCustomer;
+        try {
+            loyverseCustomer = await createCustomerInLoyverse(customerData);
+            console.log('Respuesta de Loyverse:', loyverseCustomer);
+        } catch (loyverseError) {
+            console.error('Error al crear cliente en Loyverse:', loyverseError);
+            throw new Error(`Error al crear cliente en Loyverse: ${loyverseError.message}`);
+        }
 
         if (!loyverseCustomer || !loyverseCustomer.id) {
-            throw new Error('Error al crear cliente en Loyverse');
+            throw new Error('Error al crear cliente en Loyverse: respuesta inválida');
         }
 
         // Crear objeto de Google Wallet - Ahora es obligatorio
         let walletUrl;
         try {
+            console.log('Intentando crear pase de Google Wallet para:', loyverseCustomer.customer_code);
             walletUrl = await googleWalletService.createPass(loyverseCustomer.customer_code, name, WELCOME_POINTS);
+            console.log('URL de Google Wallet generada:', walletUrl);
+            
             if (!walletUrl) {
-                throw new Error('No se pudo generar la URL de Google Wallet');
+                throw new Error('No se pudo generar la URL de Google Wallet: URL vacía');
             }
-        } catch (error) {
-            console.error('Error creating Google Wallet pass:', error);
-            throw new Error('Error al generar la tarjeta de lealtad');
+        } catch (walletError) {
+            console.error('Error detallado al crear Google Wallet pass:', walletError);
+            throw new Error(`Error al generar la tarjeta de lealtad: ${walletError.message}`);
         }
 
         // Enviar respuesta exitosa
@@ -229,10 +238,14 @@ app.post('/api/register', async (req, res) => {
             walletUrl
         });
     } catch (error) {
-        console.error('Error en registro:', error);
+        console.error('Error detallado en registro:', error);
+        
+        // Si ya se creó el cliente en Loyverse pero falló Google Wallet, 
+        // podríamos querer manejar esto de manera especial
         res.status(500).json({
             success: false,
-            message: error.message || 'Error interno del servidor'
+            message: error.message || 'Error interno del servidor',
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 });

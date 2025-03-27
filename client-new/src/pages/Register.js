@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Button,
@@ -24,6 +24,8 @@ const Register = () => {
     const [success, setSuccess] = useState(false);
     const [customerCode, setCustomerCode] = useState(null);
     const [walletUrl, setWalletUrl] = useState(null);
+    const [points, setPoints] = useState(null);
+    const [ws, setWs] = useState(null);
     const [showSnackbar, setShowSnackbar] = useState(false);
 
     const handleChange = (e) => {
@@ -32,6 +34,55 @@ const Register = () => {
             [e.target.name]: e.target.value
         });
     };
+
+    // Función para conectar WebSocket
+    const connectWebSocket = (code) => {
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProtocol}//${window.location.host}`;
+        const newWs = new WebSocket(wsUrl);
+
+        newWs.onopen = () => {
+            console.log('WebSocket connected');
+            // Registrar para actualizaciones de puntos
+            newWs.send(JSON.stringify({
+                type: 'register',
+                customerCode: code
+            }));
+        };
+
+        newWs.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.type === 'points_update') {
+                    console.log('Received points update:', data.points);
+                    setPoints(data.points);
+                }
+            } catch (error) {
+                console.error('Error processing WebSocket message:', error);
+            }
+        };
+
+        newWs.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+
+        newWs.onclose = () => {
+            console.log('WebSocket disconnected');
+            // Intentar reconectar después de 5 segundos
+            setTimeout(() => connectWebSocket(code), 5000);
+        };
+
+        setWs(newWs);
+    };
+
+    // Limpiar WebSocket al desmontar
+    useEffect(() => {
+        return () => {
+            if (ws) {
+                ws.close();
+            }
+        };
+    }, [ws]);
 
     const onSubmit = async (data) => {
         setLoading(true);
@@ -44,8 +95,12 @@ const Register = () => {
             
             if (response.data.success) {
                 setSuccess(true);
-                setCustomerCode(response.data.customer.customer_code);
+                const code = response.data.customer.customer_code;
+                setCustomerCode(code);
                 setWalletUrl(response.data.walletUrl);
+                setPoints(response.data.customer.total_points);
+                // Iniciar conexión WebSocket
+                connectWebSocket(code);
                 setShowSnackbar(true);
             }
         } catch (error) {
@@ -57,8 +112,12 @@ const Register = () => {
     };
 
     const handleReset = () => {
+        if (ws) {
+            ws.close();
+        }
         setCustomerCode(null);
         setWalletUrl(null);
+        setPoints(null);
         setSuccess(false);
         setFormData({
             name: '',
@@ -175,6 +234,12 @@ const Register = () => {
                                 <Typography variant="h6" gutterBottom>
                                     ID de Entrenador: {customerCode}
                                 </Typography>
+
+                                {points !== null && (
+                                    <Typography variant="h6" gutterBottom sx={{ color: '#4caf50' }}>
+                                        Puntos actuales: {points}
+                                    </Typography>
+                                )}
 
                                 <Box sx={{ mt: 2, mb: 4 }}>
                                     <QRCodeSVG 

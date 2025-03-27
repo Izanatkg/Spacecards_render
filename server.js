@@ -6,6 +6,8 @@ const axios = require('axios');
 const googleWalletService = require('./google-wallet-service');
 const fs = require('fs').promises;
 const path = require('path');
+const WebSocket = require('ws');
+const http = require('http');
 
 dotenv.config();
 
@@ -513,11 +515,14 @@ async function getAllCustomers() {
     }
 }
 
+// Almacenar las conexiones de WebSocket por customerCode
+const clients = new Map();
+
 // Iniciar el polling de puntos para todos los clientes
 async function startPointsPollingForAll() {
     console.log('Starting points polling system...');
     
-    // Actualizar puntos cada 2 minutos
+    // Actualizar puntos cada 30 segundos
     setInterval(async () => {
         console.log('Running points update cycle...');
         try {
@@ -528,7 +533,6 @@ async function startPointsPollingForAll() {
                 if (customer.customer_code) {
                     try {
                         await updateCustomerPoints(customer.customer_code);
-                        console.log(`Updated points for ${customer.customer_code}`);
                     } catch (error) {
                         console.error(`Error updating points for ${customer.customer_code}:`, error);
                     }
@@ -537,11 +541,74 @@ async function startPointsPollingForAll() {
         } catch (error) {
             console.error('Error in points polling cycle:', error);
         }
-    }, 2 * 60 * 1000); // 2 minutos
+    }, 30 * 1000); // 30 segundos
 }
 
-// Iniciar el polling cuando arranque el servidor
-startPointsPollingForAll();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', (ws, req) => {
+    console.log('New WebSocket connection');
+    
+    ws.on('message', (message) => {
+        try {
+            const data = JSON.parse(message);
+            if (data.type === 'register' && data.customerCode) {
+                console.log('Client registered for updates:', data.customerCode);
+                clients.set(data.customerCode, ws);
+                
+                // Obtener y enviar puntos actuales inmediatamente
+                updateCustomerPoints(data.customerCode).catch(console.error);
+            }
+        } catch (error) {
+            console.error('Error processing WebSocket message:', error);
+        }
+    });
+
+    ws.on('close', () => {
+        // Eliminar la conexión cuando se cierre
+        for (const [customerCode, client] of clients.entries()) {
+            if (client === ws) {
+                clients.delete(customerCode);
+                console.log('Client unregistered:', customerCode);
+                break;
+            }
+        }
+    });
+});
+
+// Función para enviar actualización de puntos a un cliente específico
+function sendPointsUpdate(customerCode, points) {
+    const ws = clients.get(customerCode);
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            type: 'points_update',
+            points: points
+        }));
+        console.log('Sent points update to client:', customerCode, points);
+    }
+}
+
+// Modificar la función updateCustomerPoints para usar WebSocket
+async function updateCustomerPoints(customerCode) {
+    try {
+        console.log('Updating points for customer:', customerCode);
+        const currentPoints = await getLoyversePointsForSync(customerCode);
+        console.log('Current points in Loyverse:', currentPoints);
+
+        // Actualizar Google Wallet
+        await googleWalletService.updateLoyaltyPoints(customerCode, currentPoints);
+        console.log('Updated Google Wallet points successfully');
+
+        // Enviar actualización por WebSocket
+        sendPointsUpdate(customerCode, currentPoints);
+
+        return currentPoints;
+    } catch (error) {
+        console.error('Error updating points:', error);
+        throw error;
+    }
+}
 
 // Handle React routing, return all requests to React app
 app.get('*', function(req, res, next) {
@@ -550,7 +617,9 @@ app.get('*', function(req, res, next) {
     res.sendFile(path.join(__dirname, 'client-new/build', 'index.html'));
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+// Iniciar el servidor HTTP con WebSocket
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    startPointsPollingForAll();
 });

@@ -191,7 +191,8 @@ app.post('/api/register', async (req, res) => {
             name: name.trim(),
             email: email.trim(),
             phone_number: phone.trim(),
-            loyalty_program_enabled: true
+            loyalty_program_enabled: true,
+            total_points: WELCOME_POINTS
         };
 
         console.log('Enviando datos a Loyverse:', customerData);
@@ -202,13 +203,16 @@ app.post('/api/register', async (req, res) => {
             throw new Error('Error al crear cliente en Loyverse');
         }
 
-        // Crear objeto de Google Wallet
-        let walletUrl = null;
+        // Crear objeto de Google Wallet - Ahora es obligatorio
+        let walletUrl;
         try {
             walletUrl = await googleWalletService.createPass(loyverseCustomer.customer_code, name, WELCOME_POINTS);
+            if (!walletUrl) {
+                throw new Error('No se pudo generar la URL de Google Wallet');
+            }
         } catch (error) {
             console.error('Error creating Google Wallet pass:', error);
-            // No throw here, we'll continue without the wallet URL
+            throw new Error('Error al generar la tarjeta de lealtad');
         }
 
         // Enviar respuesta exitosa

@@ -289,6 +289,101 @@ class GoogleWalletService {
             throw error;
         }
     }
+
+    async createPass(customerId, customerName, points) {
+        try {
+            console.log('Iniciando creación de pase para:', {
+                customerId,
+                customerName,
+                points,
+                classId: this.CLASS_ID,
+                issuerId: this.ISSUER_ID
+            });
+
+            // Verificar que tenemos todas las variables de entorno necesarias
+            if (!this.CLASS_ID || !this.ISSUER_ID || !this.ISSUER_NAME || !this.PROGRAM_NAME) {
+                throw new Error('Faltan variables de entorno requeridas para Google Wallet');
+            }
+
+            // Crear el objeto de lealtad
+            const loyaltyObject = {
+                id: `${this.ISSUER_ID}.${customerId}`,
+                classId: this.CLASS_ID,
+                state: "ACTIVE",
+                heroImage: {
+                    sourceUri: {
+                        uri: "https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg"
+                    }
+                },
+                textModulesData: [
+                    {
+                        header: "Puntos actuales",
+                        body: points.toString()
+                    },
+                    {
+                        header: "Nivel",
+                        body: "Entrenador"
+                    }
+                ],
+                linksModuleData: {
+                    uris: [
+                        {
+                            uri: "https://pokemon-loyalty-system.onrender.com",
+                            description: "Sitio web"
+                        }
+                    ]
+                },
+                accountId: customerId,
+                accountName: customerName,
+                loyaltyPoints: {
+                    label: "Puntos",
+                    balance: {
+                        string: points.toString()
+                    }
+                }
+            };
+
+            console.log('Objeto de lealtad creado:', loyaltyObject);
+
+            try {
+                // Intentar crear el objeto de lealtad
+                const response = await this.client.loyaltyobject.insert({
+                    requestBody: loyaltyObject
+                });
+                console.log('Objeto de lealtad creado exitosamente:', response.data);
+
+                // Generar el link de Google Wallet
+                const claims = {
+                    iss: this.credentials.client_email,
+                    aud: 'google',
+                    origins: ['https://pokemon-loyalty-system.onrender.com'],
+                    typ: 'savetowallet',
+                    payload: {
+                        loyaltyObjects: [{
+                            id: `${this.ISSUER_ID}.${customerId}`,
+                            classId: this.CLASS_ID
+                        }]
+                    }
+                };
+
+                console.log('Generando JWT con claims:', claims);
+
+                const token = jwt.sign(claims, this.credentials.private_key, {
+                    algorithm: 'RS256'
+                });
+
+                console.log('JWT generado exitosamente');
+
+                return `https://pay.google.com/gp/v/save/${token}`;
+            } catch (apiError) {
+                console.error('Error al crear objeto de lealtad en Google Wallet:', apiError.response?.data || apiError);
+                throw new Error(`Error al crear tarjeta de lealtad: ${apiError.message}`);
+            }
+        } catch (error) {
+            console.error('Error detallado en createPass:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = new GoogleWalletService();

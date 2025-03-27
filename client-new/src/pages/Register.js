@@ -35,8 +35,72 @@ const Register = () => {
         });
     };
 
+    const handleReset = () => {
+        // Cerrar WebSocket existente
+        if (ws) {
+            ws.close();
+            setWs(null);
+        }
+
+        // Resetear todos los estados
+        setCustomerCode(null);
+        setWalletUrl(null);
+        setPoints(null);
+        setSuccess(false);
+        setError(null);
+        setShowSnackbar(false);
+        
+        // Limpiar formulario
+        setFormData({
+            name: '',
+            email: '',
+            phone: ''
+        });
+    };
+
+    const onSubmit = async (data) => {
+        setLoading(true);
+        setError(null);
+        console.log('Submitting registration data:', data);
+
+        try {
+            const response = await axios.post('/api/register', data);
+            console.log('Registration successful:', response.data);
+            
+            if (response.data.success) {
+                const code = response.data.customer.customer_code;
+                
+                // Actualizar estados en orden
+                setCustomerCode(code);
+                setWalletUrl(response.data.walletUrl);
+                setPoints(response.data.customer.total_points);
+                setSuccess(true);
+                setShowSnackbar(true);
+                
+                // Iniciar conexión WebSocket después de actualizar estados
+                setTimeout(() => connectWebSocket(code), 100);
+            }
+        } catch (error) {
+            console.error('Error during registration:', error);
+            setError('Error al registrar. Por favor intenta de nuevo.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Efecto para limpiar WebSocket al desmontar
+    useEffect(() => {
+        return () => {
+            if (ws) {
+                ws.close();
+            }
+        };
+    }, [ws]);
+
     // Función para conectar WebSocket
     const connectWebSocket = (code) => {
+        if (!code) return;
+
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsUrl = `${wsProtocol}//${window.location.host}`;
         const newWs = new WebSocket(wsUrl);
@@ -68,62 +132,13 @@ const Register = () => {
 
         newWs.onclose = () => {
             console.log('WebSocket disconnected');
-            // Intentar reconectar después de 5 segundos
-            setTimeout(() => connectWebSocket(code), 5000);
+            // Intentar reconectar después de 5 segundos si aún estamos en modo éxito
+            if (success) {
+                setTimeout(() => connectWebSocket(code), 5000);
+            }
         };
 
         setWs(newWs);
-    };
-
-    // Limpiar WebSocket al desmontar
-    useEffect(() => {
-        return () => {
-            if (ws) {
-                ws.close();
-            }
-        };
-    }, [ws]);
-
-    const onSubmit = async (data) => {
-        setLoading(true);
-        setError(null);
-        console.log('Submitting registration data:', data);
-
-        try {
-            const response = await axios.post('/api/register', data);
-            console.log('Registration successful:', response.data);
-            
-            if (response.data.success) {
-                setSuccess(true);
-                const code = response.data.customer.customer_code;
-                setCustomerCode(code);
-                setWalletUrl(response.data.walletUrl);
-                setPoints(response.data.customer.total_points);
-                // Iniciar conexión WebSocket
-                connectWebSocket(code);
-                setShowSnackbar(true);
-            }
-        } catch (error) {
-            console.error('Error during registration:', error);
-            setError('Error al registrar. Por favor intenta de nuevo.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleReset = () => {
-        if (ws) {
-            ws.close();
-        }
-        setCustomerCode(null);
-        setWalletUrl(null);
-        setPoints(null);
-        setSuccess(false);
-        setFormData({
-            name: '',
-            email: '',
-            phone: ''
-        });
     };
 
     return (

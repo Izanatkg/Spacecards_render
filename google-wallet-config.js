@@ -3,7 +3,7 @@ const { GoogleAuth } = require('google-auth-library');
 
 // Usar variables de entorno o valores por defecto
 const ISSUER_ID = process.env.ISSUER_ID || '3388000000022884108';
-const CLASS_ID = process.env.CLASS_ID || `${ISSUER_ID}.yugioh_loyalty_card_v2`;
+const CLASS_ID = process.env.CLASS_ID || `${ISSUER_ID}.pokemon_loyalty_card`;
 
 let credentials;
 try {
@@ -36,29 +36,29 @@ const loyaltyClass = {
         kind: "walletobjects#localizedString",
         defaultValue: {
             language: "es",
-            value: "Club Duelista"
+            value: "Pokemon Loyalty Program"
         }
     },
     programLogo: {
         kind: "walletobjects#image",
         sourceUri: {
-            uri: 'https://i.imgur.com/FpqHJGe.png',
-            description: "Club Duelista Logo"
+            uri: 'https://i.imgur.com/space_logo.png',
+            description: "Space Pass Pokemon"
         }
     },
     reviewStatus: 'ACTIVE',
-    hexBackgroundColor: '#D4AF37',
+    hexBackgroundColor: '#1a1f2e',
     heroImage: {
         kind: "walletobjects#image",
         sourceUri: {
-            uri: 'https://i.imgur.com/FpqHJGe.png',
-            description: "Club Duelista Logo"
+            uri: 'https://i.imgur.com/space_logo.png',
+            description: "Space Pass Pokemon"
         }
     },
     locations: [
         {
             address: {
-                addressLines: ['Dirección de Mamitas Tepic'],
+                addressLines: ['Av. México 324, San Juan'],
                 locality: 'Tepic',
                 administrativeArea: 'Nayarit',
                 countryCode: 'MX'

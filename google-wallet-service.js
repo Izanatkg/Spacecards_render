@@ -66,7 +66,7 @@ class GoogleWalletService {
             "programName": "Club Duelista",
             "programLogo": {
                 "sourceUri": {
-                    "uri": process.env.PROGRAM_LOGO
+                    "uri": "https://i.imgur.com/FpqHJGe.png"
                 }
             },
             "rewardsTier": "REWARDS_TIER_UNSPECIFIED",
@@ -74,17 +74,31 @@ class GoogleWalletService {
             "id": this.CLASS_ID,
             "version": "1",
             "hexBackgroundColor": "#D4AF37",
-            "hexFontColor": process.env.HEX_FONT_COLOR,
-            "provider": process.env.PROVIDER,
+            "hexFontColor": "#FFFFFF",
+            "multipleDevicesAndHoldersAllowedStatus": "STATUS_UNSPECIFIED",
             "infoModuleData": {
                 "labelValueRows": [
                     {
                         "columns": [
                             {
-                                "label": "Programa de lealtad",
-                                "value": process.env.PROGRAM_NAME
+                                "label": "Programa",
+                                "value": "Club Duelista"
                             }
                         ]
+                    }
+                ]
+            },
+            "textModulesData": [
+                {
+                    "header": "Puntos de Duelo",
+                    "body": "0"
+                }
+            ],
+            "linksModuleData": {
+                "uris": [
+                    {
+                        "uri": "https://pokemon-loyalty-system.onrender.com",
+                        "description": "Visitar Tienda"
                     }
                 ]
             }

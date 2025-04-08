@@ -193,51 +193,162 @@ const Register = () => {
     }
 
     return (
-        <Container maxWidth="sm">
-            <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-                <Typography variant="h5" gutterBottom>
-                    Registro de Entrenador
-                </Typography>
-                <form onSubmit={handleSubmit}>
-                    <TextField
-                        fullWidth
-                        required
-                        label="Nombre completo"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        margin="normal"
-                    />
-                    <TextField
-                        fullWidth
-                        required
-                        label="Correo electrónico"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        margin="normal"
-                    />
-                    <TextField
-                        fullWidth
-                        required
-                        label="Teléfono"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        margin="normal"
-                    />
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        disabled={loading}
-                        sx={{ mt: 3 }}
+        <Container maxWidth="md">
+            <Paper 
+                elevation={3} 
+                sx={{ 
+                    p: 0, 
+                    mt: 4,
+                    borderRadius: 4,
+                    overflow: 'hidden',
+                    bgcolor: '#1a1f2e',
+                    color: 'white',
+                    display: 'flex'
+                }}
+            >
+                {/* Lado izquierdo - Logo */}
+                <Box sx={{ 
+                    p: 4, 
+                    bgcolor: '#141821',
+                    width: '40%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
+                    <Box 
+                        sx={{ 
+                            width: 120,
+                            height: 120,
+                            mb: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
                     >
-                        {loading ? 'Registrando...' : 'Registrar'}
-                    </Button>
-                </form>
+                        <Box
+                            component="img"
+                            src="/astronaut-icon.png"
+                            alt="Stellar Cadet"
+                            sx={{ 
+                                width: '100%',
+                                height: '100%',
+                                filter: 'brightness(0.9) sepia(0.2) opacity(0.9)'
+                            }}
+                        />
+                    </Box>
+                    <Typography 
+                        variant="h4" 
+                        sx={{ 
+                            color: '#f0f0f0',
+                            fontWeight: 'bold',
+                            textAlign: 'center',
+                            textTransform: 'uppercase',
+                            letterSpacing: 1
+                        }}
+                    >
+                        Stellar<br/>Cadet
+                    </Typography>
+                </Box>
+
+                {/* Lado derecho - Formulario */}
+                <Box sx={{ p: 4, width: '60%' }}>
+                    <Typography 
+                        variant="h4" 
+                        sx={{ 
+                            mb: 1,
+                            background: 'linear-gradient(45deg, #9c27b0, #7986cb)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent'
+                        }}
+                    >
+                        Nivel Stellar Cadet
+                    </Typography>
+                    <Typography 
+                        variant="h6" 
+                        sx={{ 
+                            mb: 3,
+                            color: '#64b5f6'
+                        }}
+                    >
+                        El Inicio de tu Viaje
+                    </Typography>
+                    <form onSubmit={handleSubmit}>
+                        <TextField
+                            fullWidth
+                            required
+                            label="Nombre completo"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            margin="normal"
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': { borderColor: '#404759' },
+                                    '&:hover fieldset': { borderColor: '#4a5568' },
+                                    '&.Mui-focused fieldset': { borderColor: '#7986cb' }
+                                },
+                                '& .MuiInputLabel-root': { color: '#b0b8c8' },
+                                '& .MuiOutlinedInput-input': { color: '#ffffff' }
+                            }}
+                        />
+                        <TextField
+                            fullWidth
+                            required
+                            label="Correo electrónico"
+                            name="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            margin="normal"
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': { borderColor: '#404759' },
+                                    '&:hover fieldset': { borderColor: '#4a5568' },
+                                    '&.Mui-focused fieldset': { borderColor: '#7986cb' }
+                                },
+                                '& .MuiInputLabel-root': { color: '#b0b8c8' },
+                                '& .MuiOutlinedInput-input': { color: '#ffffff' }
+                            }}
+                        />
+                        <TextField
+                            fullWidth
+                            required
+                            label="Teléfono"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            margin="normal"
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': { borderColor: '#404759' },
+                                    '&:hover fieldset': { borderColor: '#4a5568' },
+                                    '&.Mui-focused fieldset': { borderColor: '#7986cb' }
+                                },
+                                '& .MuiInputLabel-root': { color: '#b0b8c8' },
+                                '& .MuiOutlinedInput-input': { color: '#ffffff' }
+                            }}
+                        />
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            disabled={loading}
+                            sx={{ 
+                                mt: 3,
+                                py: 1.5,
+                                background: 'linear-gradient(45deg, #7e57c2, #5c6bc0)',
+                                '&:hover': {
+                                    background: 'linear-gradient(45deg, #9575cd, #7986cb)'
+                                },
+                                textTransform: 'none',
+                                fontSize: '1.1rem'
+                            }}
+                        >
+                            {loading ? 'Registrando...' : 'Registrar'}
+                        </Button>
+                    </form>
+                </Box>
             </Paper>
             <Snackbar
                 open={showSnackbar}

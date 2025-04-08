@@ -164,7 +164,7 @@ class GoogleWalletService {
                 state: 'ACTIVE',
                 accountId: email,
                 accountName: name,
-                hexBackgroundColor: '#FF5733',
+                hexBackgroundColor: '#D4AF37',
                 logo: {
                     sourceUri: {
                         uri: 'https://i.imgur.com/FpqHJGe.png',
@@ -174,12 +174,12 @@ class GoogleWalletService {
                 header: {
                     defaultValue: {
                         language: 'es',
-                        value: 'Club Pokémon'
+                        value: 'Club Duelista'
                     }
                 },
                 textModulesData: [
                     {
-                        header: 'PokéPuntos',
+                        header: 'Puntos de Duelo',
                         body: points ? points.toString() : '31.1'
                     }
                 ],

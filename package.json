@@ -1,5 +1,5 @@
 {
-  "name": "pokemon-loyalty-system",
+  "name": "spacecards-loyalty",
   "version": "1.0.0",
   "description": "Sistema de lealtad Pokémon con Loyverse y Google Wallet",
   "main": "server.js",
@@ -14,7 +14,7 @@
     "node": ">=14.0.0"
   },
   "keywords": [
-    "pokemon",
+    "yugioh",
     "loyalty",
     "qr"
   ],

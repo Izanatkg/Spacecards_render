@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: pokemon-loyalty-system
+    name: spacecards-loyalty
     env: node
     buildCommand: ./build.sh
     startCommand: node server.js

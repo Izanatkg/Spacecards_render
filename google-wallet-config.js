@@ -3,7 +3,7 @@ const { GoogleAuth } = require('google-auth-library');
 
 // Usar variables de entorno o valores por defecto
 const ISSUER_ID = process.env.ISSUER_ID || '3388000000022884108';
-const CLASS_ID = process.env.CLASS_ID || `${ISSUER_ID}.pokemon_loyalty_card`;
+const CLASS_ID = process.env.CLASS_ID || `${ISSUER_ID}.yugioh_loyalty_card`;
 
 let credentials;
 try {
@@ -26,17 +26,17 @@ const auth = new GoogleAuth({
 const loyaltyClass = {
     id: CLASS_ID,
     issuerName: process.env.ISSUER_NAME || 'Mamitas Tepic',
-    programName: process.env.PROGRAM_NAME || 'Programa de Lealtad Pokémon',
+    programName: 'Club Duelista',
     programLogo: {
         sourceUri: {
-            uri: process.env.PROGRAM_LOGO || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png'
+            uri: 'https://i.imgur.com/FpqHJGe.png'
         }
     },
     reviewStatus: 'ACTIVE',
-    hexBackgroundColor: process.env.HEX_BACKGROUND_COLOR || '#FF5733',
+    hexBackgroundColor: '#D4AF37',
     heroImage: {
         sourceUri: {
-            uri: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png'
+            uri: 'https://i.imgur.com/FpqHJGe.png'
         }
     },
     locations: [

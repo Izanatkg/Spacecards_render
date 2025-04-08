@@ -25,18 +25,34 @@ const auth = new GoogleAuth({
 
 const loyaltyClass = {
     id: CLASS_ID,
-    issuerName: process.env.ISSUER_NAME || 'Mamitas Tepic',
-    programName: 'Club Duelista',
+    issuerName: {
+        kind: "walletobjects#localizedString",
+        defaultValue: {
+            language: "es",
+            value: process.env.ISSUER_NAME || 'Mamitas Tepic'
+        }
+    },
+    programName: {
+        kind: "walletobjects#localizedString",
+        defaultValue: {
+            language: "es",
+            value: "Club Duelista"
+        }
+    },
     programLogo: {
+        kind: "walletobjects#image",
         sourceUri: {
-            uri: 'https://i.imgur.com/FpqHJGe.png'
+            uri: 'https://i.imgur.com/FpqHJGe.png',
+            description: "Club Duelista Logo"
         }
     },
     reviewStatus: 'ACTIVE',
     hexBackgroundColor: '#D4AF37',
     heroImage: {
+        kind: "walletobjects#image",
         sourceUri: {
-            uri: 'https://i.imgur.com/FpqHJGe.png'
+            uri: 'https://i.imgur.com/FpqHJGe.png',
+            description: "Club Duelista Logo"
         }
     },
     locations: [

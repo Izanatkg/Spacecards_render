@@ -321,8 +321,10 @@ class GoogleWalletService {
                 hexBackgroundColor: "#D4AF37",
                 hexFontColor: "#FFFFFF",
                 heroImage: {
+                    kind: "walletobjects#image",
                     sourceUri: {
-                        uri: "https://i.imgur.com/FpqHJGe.png"
+                        uri: "https://i.imgur.com/FpqHJGe.png",
+                        description: "Club Duelista Logo"
                     }
                 },
                 textModulesData: [
@@ -339,11 +341,23 @@ class GoogleWalletService {
                     uris: [
                         {
                             uri: "https://spacecards-loyalty.onrender.com",
-                            description: "Visítanos"
+                            description: "Visítanos",
+                            localizedDescription: {
+                                defaultValue: {
+                                    language: "es",
+                                    value: "Visítanos"
+                                }
+                            }
                         },
                         {
                             uri: "https://spacecards-loyalty.onrender.com/tienda",
-                            description: "Visitar Tienda"
+                            description: "Visitar Tienda",
+                            localizedDescription: {
+                                defaultValue: {
+                                    language: "es",
+                                    value: "Visitar Tienda"
+                                }
+                            }
                         }
                     ]
                 },
@@ -353,6 +367,13 @@ class GoogleWalletService {
                     label: "Puntos de Duelo",
                     balance: {
                         string: points.toString()
+                    }
+                },
+                localizedAccountName: {
+                    kind: "walletobjects#localizedString",
+                    defaultValue: {
+                        language: "es",
+                        value: customerName
                     }
                 }
             };

@@ -180,7 +180,7 @@ class GoogleWalletService {
                 textModulesData: [
                     {
                         header: 'PokéPuntos',
-                        body: Math.floor(points || 0).toString()
+                        body: points ? points.toString() : '31.1'
                     }
                 ],
                 barcode: {
@@ -188,18 +188,6 @@ class GoogleWalletService {
                     value: id,
                     alternateText: id,
                     showCodeText: { kind: 'walletobjects#value', value: email }
-                },
-                linksModuleData: {
-                    uris: [
-                        {
-                            uri: 'https://pokemon-loyalty-system.onrender.com',
-                            description: 'Visítanos'
-                        },
-                        {
-                            uri: 'https://pokemon-loyalty-system.onrender.com/store',
-                            description: 'Visitar Tienda'
-                        }
-                    ]
                 }
             };
 

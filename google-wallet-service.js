@@ -8,7 +8,7 @@ const { google } = require('googleapis');
 class GoogleWalletService {
     constructor() {
         // Valores por defecto para el entorno de desarrollo
-        this.CLASS_ID = process.env.CLASS_ID || '3388000000022884108.yugioh_loyalty_card';
+        this.CLASS_ID = process.env.CLASS_ID || '3388000000022884108.yugioh_loyalty_card_v2';
         this.ISSUER_ID = process.env.ISSUER_ID || '3388000000022884108';
         this.ISSUER_NAME = process.env.ISSUER_NAME || 'Mamitas Tepic';
         this.PROGRAM_NAME = process.env.PROGRAM_NAME || 'Club Duelista';
@@ -119,32 +119,27 @@ class GoogleWalletService {
 
     async createLoyaltyClass() {
         try {
-            console.log('Creating/Updating loyalty class...');
+            console.log('Creating new loyalty class...');
             const token = await this.getAuthToken();
             
+            // Intentar eliminar la clase existente primero
             try {
-                // Intentar actualizar la clase existente
-                const response = await axios.put(
+                await axios.delete(
                     `${this.baseUrl}/loyaltyClass/${this.CLASS_ID}`,
-                    this.loyaltyClass,
                     {
                         headers: { 
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
+                            'Authorization': `Bearer ${token}`
                         }
                     }
                 );
-                console.log('Loyalty class updated successfully');
-                return response.data;
+                console.log('Existing loyalty class deleted successfully');
             } catch (error) {
-                if (error.response?.status === 404) {
-                    // La clase no existe, vamos a crearla
-                    console.log('Loyalty class not found, creating new one...');
-                } else {
-                    console.error('Error updating loyalty class:', error.response?.data || error.message);
-                    throw error;
-                }
+                // Ignorar errores si la clase no existe
+                console.log('No existing loyalty class to delete or error:', error.message);
             }
+            
+            // Crear una nueva clase
+            console.log('Creating new loyalty class...');
 
             // Crear la clase de lealtad
             const response = await axios.post(

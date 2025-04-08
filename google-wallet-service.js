@@ -186,14 +186,19 @@ class GoogleWalletService {
                     }
                 ],
                 hexBackgroundColor: '#FF5733',
+                barcode: {
+                    type: 'QR_CODE',
+                    value: id,
+                    alternateText: id
+                },
                 logo: {
                     sourceUri: {
-                        uri: `https://quickchart.io/qr?text=${id}&size=150`
+                        uri: 'https://i.imgur.com/FpqHJGe.png'
                     }
                 },
                 heroImage: {
                     sourceUri: {
-                        uri: `https://quickchart.io/qr?text=${id}&size=500&margin=1&ecLevel=Q`
+                        uri: 'https://i.imgur.com/FpqHJGe.png'
                     }
                 }
             };

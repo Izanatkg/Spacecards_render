@@ -206,6 +206,12 @@ class GoogleWalletService {
                             description: 'Visitar Tienda'
                         }
                     ]
+                },
+                loyaltyPoints: {
+                    balance: {
+                        int: Math.floor(points || 0)
+                    },
+                    label: 'Puntos'
                 }
             };
 
@@ -276,7 +282,7 @@ class GoogleWalletService {
                     requestBody: {
                         loyaltyPoints: {
                             balance: {
-                                int: points
+                                int: Math.floor(points)
                             }
                         }
                     }

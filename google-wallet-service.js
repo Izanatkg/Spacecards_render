@@ -318,33 +318,39 @@ class GoogleWalletService {
                 id: `${this.ISSUER_ID}.${customerId}`,
                 classId: this.CLASS_ID,
                 state: "ACTIVE",
+                hexBackgroundColor: "#D4AF37",
+                hexFontColor: "#FFFFFF",
                 heroImage: {
                     sourceUri: {
-                        uri: "https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg"
+                        uri: "https://i.imgur.com/FpqHJGe.png"
                     }
                 },
                 textModulesData: [
                     {
-                        header: "Puntos actuales",
+                        header: "Puntos de Duelo",
                         body: points.toString()
                     },
                     {
                         header: "Nivel",
-                        body: "Entrenador"
+                        body: "Duelista"
                     }
                 ],
                 linksModuleData: {
                     uris: [
                         {
-                            uri: "https://pokemon-loyalty-system.onrender.com",
-                            description: "Sitio web"
+                            uri: "https://spacecards-loyalty.onrender.com",
+                            description: "Visítanos"
+                        },
+                        {
+                            uri: "https://spacecards-loyalty.onrender.com/tienda",
+                            description: "Visitar Tienda"
                         }
                     ]
                 },
                 accountId: customerId,
                 accountName: customerName,
                 loyaltyPoints: {
-                    label: "Puntos",
+                    label: "Puntos de Duelo",
                     balance: {
                         string: points.toString()
                     }
@@ -364,7 +370,7 @@ class GoogleWalletService {
                 const claims = {
                     iss: this.credentials.client_email,
                     aud: 'google',
-                    origins: ['https://pokemon-loyalty-system.onrender.com'],
+                    origins: ['https://spacecards-loyalty.onrender.com'],
                     typ: 'savetowallet',
                     payload: {
                         loyaltyObjects: [{

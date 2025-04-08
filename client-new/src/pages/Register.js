@@ -228,7 +228,7 @@ const Register = () => {
                     >
                         <Box
                             component="img"
-                            src="/astronaut-icon.png"
+                            src="https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg"
                             alt="Stellar Cadet"
                             sx={{ 
                                 width: '100%',
@@ -262,7 +262,7 @@ const Register = () => {
                             WebkitTextFillColor: 'transparent'
                         }}
                     >
-                        Nivel Stellar Cadet
+                        Stellar Cadet
                     </Typography>
                     <Typography 
                         variant="h6" 

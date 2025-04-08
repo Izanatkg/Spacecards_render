@@ -188,33 +188,14 @@ class GoogleWalletService {
                 hexBackgroundColor: '#FF5733',
                 logo: {
                     sourceUri: {
-                        uri: 'https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg'
-                    },
-                    contentDescription: {
-                        defaultValue: {
-                            language: 'es',
-                            value: 'Logo Club Pokemon'
-                        }
+                        uri: `https://quickchart.io/qr?text=${id}&size=150`
                     }
                 },
                 heroImage: {
                     sourceUri: {
-                        uri: 'https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg'
+                        uri: `https://quickchart.io/qr?text=${id}&size=500&margin=1&ecLevel=Q`
                     }
-                },
-                imageModulesData: [{
-                    mainImage: {
-                        sourceUri: {
-                            uri: `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(id)}&format=png`
-                        },
-                        contentDescription: {
-                            defaultValue: {
-                                language: 'es',
-                                value: 'Código QR de identificación'
-                            }
-                        }
-                    }
-                }]
+                }
             };
 
             // Verificar si el objeto ya existe

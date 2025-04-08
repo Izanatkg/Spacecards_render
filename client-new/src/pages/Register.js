@@ -87,8 +87,11 @@ const Register = () => {
             }
         } catch (error) {
             console.error('Error during registration:', error);
-            setError(error.message || 'Error al registrar. Por favor intenta de nuevo.');
+            const errorMessage = error.response?.data?.message || error.message || 'Error al registrar. Por favor intenta de nuevo.';
+            console.log('Error message:', errorMessage);
+            setError(errorMessage);
             setSuccess(false);
+            setShowSnackbar(true);
         } finally {
             setLoading(false);
         }

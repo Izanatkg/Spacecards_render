@@ -36,14 +36,14 @@ const loyaltyClass = {
         kind: "walletobjects#localizedString",
         defaultValue: {
             language: "es",
-            value: "Pokemon Loyalty Program"
+            value: "Space Pass"
         }
     },
     programLogo: {
         kind: "walletobjects#image",
         sourceUri: {
-            uri: 'https://i.imgur.com/space_logo.png',
-            description: "Space Pass Pokemon"
+            uri: 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
+            description: "Space Pass Logo"
         }
     },
     reviewStatus: 'ACTIVE',

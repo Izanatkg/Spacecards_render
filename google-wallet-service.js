@@ -119,27 +119,31 @@ class GoogleWalletService {
 
     async createLoyaltyClass() {
         try {
-            console.log('Creating loyalty class...');
+            console.log('Creating/Updating loyalty class...');
             const token = await this.getAuthToken();
             
-            // Primero intentar obtener la clase existente
             try {
-                const response = await axios.get(
+                // Intentar actualizar la clase existente
+                const response = await axios.put(
                     `${this.baseUrl}/loyaltyClass/${this.CLASS_ID}`,
+                    this.loyaltyClass,
                     {
                         headers: { 
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
                         }
                     }
                 );
-                console.log('Loyalty class already exists');
+                console.log('Loyalty class updated successfully');
                 return response.data;
             } catch (error) {
-                if (error.response?.status !== 404) {
+                if (error.response?.status === 404) {
+                    // La clase no existe, vamos a crearla
+                    console.log('Loyalty class not found, creating new one...');
+                } else {
+                    console.error('Error updating loyalty class:', error.response?.data || error.message);
                     throw error;
                 }
-                // La clase no existe, vamos a crearla
-                console.log('Loyalty class not found, creating new one...');
             }
 
             // Crear la clase de lealtad

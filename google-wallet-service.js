@@ -164,42 +164,48 @@ class GoogleWalletService {
                 state: 'ACTIVE',
                 accountId: email,
                 accountName: name,
-                barcode: {
-                    type: 'QR_CODE',
-                    value: id,
-                    alternateText: id
-                },
-                loyaltyPoints: {
-                    balance: {
-                        int: Math.floor(points || 0)
-                    },
-                    label: 'Puntos'
-                },
-                textModulesData: [
-                    {
-                        header: 'ID de Entrenador',
-                        body: id
-                    },
-                    {
-                        header: 'Nombre',
-                        body: name
-                    }
-                ],
                 hexBackgroundColor: '#FF5733',
-                barcode: {
-                    type: 'QR_CODE',
-                    value: id,
-                    alternateText: id
-                },
                 logo: {
                     sourceUri: {
-                        uri: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${id}&margin=1&format=png`
+                        uri: 'https://i.imgur.com/FpqHJGe.png',
+                        description: 'SpaceCards Logo'
                     }
                 },
-                heroImage: {
-                    sourceUri: {
-                        uri: `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${id}&margin=1&format=png`
+                cardTitle: {
+                    defaultValue: {
+                        language: 'es',
+                        value: 'Club Pokémon'
                     }
+                },
+                header: {
+                    defaultValue: {
+                        language: 'es',
+                        value: 'PokéPuntos'
+                    }
+                },
+                subheader: {
+                    defaultValue: {
+                        language: 'es',
+                        value: Math.floor(points || 0).toString()
+                    }
+                },
+                barcode: {
+                    type: 'QR_CODE',
+                    value: id,
+                    alternateText: id,
+                    showCodeText: { kind: 'walletobjects#value', value: email }
+                },
+                linksModuleData: {
+                    uris: [
+                        {
+                            uri: 'https://pokemon-loyalty-system.onrender.com',
+                            description: 'Visítanos'
+                        },
+                        {
+                            uri: 'https://pokemon-loyalty-system.onrender.com/store',
+                            description: 'Visitar Tienda'
+                        }
+                    ]
                 }
             };
 

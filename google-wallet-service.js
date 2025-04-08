@@ -188,12 +188,12 @@ class GoogleWalletService {
                 hexBackgroundColor: '#FF5733',
                 logo: {
                     sourceUri: {
-                        uri: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${id}`
+                        uri: `https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=${encodeURIComponent(id)}&chld=H|1`
                     }
                 },
                 heroImage: {
                     sourceUri: {
-                        uri: `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${id}`
+                        uri: `https://chart.googleapis.com/chart?cht=qr&chs=500x500&chl=${encodeURIComponent(id)}&chld=H|1`
                     }
                 }
             };

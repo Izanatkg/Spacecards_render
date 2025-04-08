@@ -8,10 +8,10 @@ const { google } = require('googleapis');
 class GoogleWalletService {
     constructor() {
         // Valores por defecto para el entorno de desarrollo
-        this.CLASS_ID = process.env.CLASS_ID || '3388000000022884108.pokemon_loyalty_card';
+        this.CLASS_ID = process.env.CLASS_ID || '3388000000022884108.yugioh_loyalty_card';
         this.ISSUER_ID = process.env.ISSUER_ID || '3388000000022884108';
         this.ISSUER_NAME = process.env.ISSUER_NAME || 'Mamitas Tepic';
-        this.PROGRAM_NAME = process.env.PROGRAM_NAME || 'Pokemon Loyalty Program';
+        this.PROGRAM_NAME = process.env.PROGRAM_NAME || 'Club Duelista';
         this.PROGRAM_LOGO = process.env.PROGRAM_LOGO || 'https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg';
 
         // Cargar credenciales
@@ -63,7 +63,7 @@ class GoogleWalletService {
         this.CLIENT_ID = process.env.CLIENT_ID;
         this.loyaltyClass = {
             "issuerName": process.env.ISSUER_NAME,
-            "programName": process.env.PROGRAM_NAME,
+            "programName": "Club Duelista",
             "programLogo": {
                 "sourceUri": {
                     "uri": process.env.PROGRAM_LOGO
@@ -73,7 +73,7 @@ class GoogleWalletService {
             "reviewStatus": "REVIEW_STATUS_UNSPECIFIED",
             "id": this.CLASS_ID,
             "version": "1",
-            "hexBackgroundColor": process.env.HEX_BACKGROUND_COLOR,
+            "hexBackgroundColor": "#D4AF37",
             "hexFontColor": process.env.HEX_FONT_COLOR,
             "provider": process.env.PROVIDER,
             "infoModuleData": {

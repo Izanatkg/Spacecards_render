@@ -171,24 +171,18 @@ class GoogleWalletService {
                         description: 'SpaceCards Logo'
                     }
                 },
-                cardTitle: {
+                header: {
                     defaultValue: {
                         language: 'es',
                         value: 'Club Pokémon'
                     }
                 },
-                header: {
-                    defaultValue: {
-                        language: 'es',
-                        value: 'PokéPuntos'
+                textModulesData: [
+                    {
+                        header: 'PokéPuntos',
+                        body: Math.floor(points || 0).toString()
                     }
-                },
-                subheader: {
-                    defaultValue: {
-                        language: 'es',
-                        value: Math.floor(points || 0).toString()
-                    }
-                },
+                ],
                 barcode: {
                     type: 'QR_CODE',
                     value: id,
@@ -206,12 +200,6 @@ class GoogleWalletService {
                             description: 'Visitar Tienda'
                         }
                     ]
-                },
-                loyaltyPoints: {
-                    balance: {
-                        int: Math.floor(points || 0)
-                    },
-                    label: 'Puntos'
                 }
             };
 

@@ -12,6 +12,12 @@ const http = require('http');
 dotenv.config();
 
 const app = express();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const LOYVERSE_TOKEN = '68c66646696548af983a2a0b8e64c2ec';
 const LOYVERSE_API_URL = 'https://api.loyverse.com/v1.0';
 const LOYVERSE_API_BASE = LOYVERSE_API_URL;

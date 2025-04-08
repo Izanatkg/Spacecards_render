@@ -7,40 +7,40 @@ const Home = () => {
 
     const features = [
         {
-            icon: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/rare-candy.png',
-            title: 'Gana Puntos',
-            description: 'Acumula PokéPuntos con cada compra y canjéalos por cartas exclusivas.'
+            icon: 'https://i.imgur.com/stellar_cadet.png',
+            title: 'Stellar Cadet',
+            description: '2% de cash back en compras y acceso a torneos semanales sin costo.'
         },
         {
-            icon: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png',
-            title: 'Cartas Exclusivas',
-            description: 'Accede a cartas Pokémon especiales y ediciones limitadas.'
+            icon: 'https://i.imgur.com/nebula_hunter.png',
+            title: 'Nebula Hunter',
+            description: '2% extra en cashback y acceso a preventas 24h antes.'
         },
         {
-            icon: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/lucky-egg.png',
-            title: 'Beneficios Especiales',
-            description: 'Obtén descuentos y promociones exclusivas para miembros.'
+            icon: 'https://i.imgur.com/cosmic_legend.png',
+            title: 'Cosmic Legend',
+            description: 'Preventas 72h antes y acceso a productos ultra raros.'
         }
     ];
 
     const featuredCards = [
         {
-            image: 'https://assets.pokemon.com/assets/cms2/img/cards/web/SM10/SM10_EN_226.png',
-            name: 'Charizard GX',
-            rarity: 'Ultra Rara',
+            image: 'https://i.imgur.com/space_card1.png',
+            name: 'Nebula Pack',
+            rarity: 'Stellar',
+            points: 2500
+        },
+        {
+            image: 'https://i.imgur.com/space_card2.png',
+            name: 'Cosmic Box',
+            rarity: 'Ultra Rare',
             points: 5000
         },
         {
-            image: 'https://assets.pokemon.com/assets/cms2/img/cards/web/SWSH4/SWSH4_EN_188.png',
-            name: 'Pikachu VMAX',
-            rarity: 'Secreta Rara',
-            points: 4500
-        },
-        {
-            image: 'https://assets.pokemon.com/assets/cms2/img/cards/web/SV01/SV01_EN_198.png',
-            name: 'Mewtwo V',
-            rarity: 'Full Art',
-            points: 3500
+            image: 'https://i.imgur.com/space_card3.png',
+            name: 'Galaxy Set',
+            rarity: 'Legendary',
+            points: 7500
         }
     ];
 

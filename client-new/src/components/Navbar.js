@@ -1,5 +1,6 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -9,9 +10,12 @@ function Navbar() {
     return (
         <AppBar position="static">
             <Toolbar>
-                <Typography variant="h6" component={Link} to="/" style={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}>
-                    PokéPuntos
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+                    <RocketLaunchIcon sx={{ mr: 1 }} />
+                    <Typography variant="h6" component={Link} to="/" sx={{ textDecoration: 'none', color: 'inherit' }}>
+                        Space Pass
+                    </Typography>
+                </Box>
                 {!user ? (
                     <Button color="inherit" component={Link} to="/register">
                         Registrarse

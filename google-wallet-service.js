@@ -171,7 +171,7 @@ class GoogleWalletService {
                 },
                 loyaltyPoints: {
                     balance: {
-                        int: points || 0
+                        int: Math.floor(points || 0)
                     },
                     label: 'Puntos'
                 },
@@ -193,12 +193,12 @@ class GoogleWalletService {
                 },
                 logo: {
                     sourceUri: {
-                        uri: 'https://i.imgur.com/FpqHJGe.png'
+                        uri: `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${id}&margin=1&format=png`
                     }
                 },
                 heroImage: {
                     sourceUri: {
-                        uri: 'https://i.imgur.com/FpqHJGe.png'
+                        uri: `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${id}&margin=1&format=png`
                     }
                 }
             };

@@ -151,42 +151,138 @@ const Register = () => {
 
     if (success && customerCode) {
         return (
-            <Container maxWidth="sm">
-                <Paper elevation={3} sx={{ p: 4, mt: 4, textAlign: 'center' }}>
-                    <Typography variant="h5" gutterBottom>
-                        ¡Registro Exitoso!
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                        Tu código de cliente es:
-                    </Typography>
-                    <Box sx={{ my: 2 }}>
-                        <QRCodeSVG value={customerCode} size={200} />
-                    </Box>
-                    <Typography variant="h6" gutterBottom>
-                        {customerCode}
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                        Puntos actuales: {points || 0}
-                    </Typography>
-                    {walletUrl && (
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            href={walletUrl}
-                            target="_blank"
-                            sx={{ mt: 2 }}
+            <Container maxWidth="md">
+                <Paper 
+                    elevation={3} 
+                    sx={{ 
+                        p: 0,
+                        mt: 4,
+                        borderRadius: 4,
+                        overflow: 'hidden',
+                        bgcolor: '#1a1f2e',
+                        color: 'white',
+                        display: 'flex'
+                    }}
+                >
+                    {/* Lado izquierdo - Monedero */}
+                    <Box sx={{ 
+                        p: 4, 
+                        bgcolor: '#141821',
+                        width: '40%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <Box 
+                            sx={{ 
+                                width: 200,
+                                height: 200,
+                                mb: 2,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                position: 'relative'
+                            }}
                         >
-                            Añadir a Google Wallet
-                        </Button>
-                    )}
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={handleReset}
-                        sx={{ mt: 2, ml: walletUrl ? 2 : 0 }}
-                    >
-                        Registrar otro cliente
-                    </Button>
+                            <QRCodeSVG 
+                                value={customerCode} 
+                                size={200}
+                                style={{
+                                    background: '#1a1f2e',
+                                    padding: '10px',
+                                    borderRadius: '10px',
+                                }}
+                            />
+                        </Box>
+                        <Typography 
+                            variant="h6" 
+                            sx={{ 
+                                color: '#f0f0f0',
+                                textAlign: 'center',
+                                mb: 1
+                            }}
+                        >
+                            {customerCode}
+                        </Typography>
+                    </Box>
+
+                    {/* Lado derecho - Información */}
+                    <Box sx={{ p: 4, width: '60%' }}>
+                        <Typography 
+                            variant="h4" 
+                            sx={{ 
+                                mb: 2,
+                                background: 'linear-gradient(45deg, #9c27b0, #7986cb)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent'
+                            }}
+                        >
+                            Monedero Electrónico Space Pass
+                        </Typography>
+                        <Typography 
+                            variant="h6" 
+                            sx={{ 
+                                mb: 3,
+                                color: '#64b5f6'
+                            }}
+                        >
+                            Acumula y Disfruta
+                        </Typography>
+                        <Typography 
+                            variant="body1" 
+                            sx={{ 
+                                mb: 3,
+                                color: '#b0b8c8',
+                                lineHeight: 1.6
+                            }}
+                        >
+                            Cada compra te da un <span style={{color: '#fff', fontWeight: 'bold'}}>2%</span> directamente 
+                            a tu monedero electrónico. ¡Acumula crédito y úsalo para tus próximas adquisiciones!
+                        </Typography>
+                        <Typography 
+                            variant="h6" 
+                            sx={{ 
+                                mb: 2,
+                                color: '#7986cb'
+                            }}
+                        >
+                            Puntos actuales: <span style={{color: '#fff'}}>{points || 0}</span>
+                        </Typography>
+                        <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
+                            {walletUrl && (
+                                <Button
+                                    variant="contained"
+                                    href={walletUrl}
+                                    target="_blank"
+                                    sx={{ 
+                                        background: 'linear-gradient(45deg, #7e57c2, #5c6bc0)',
+                                        '&:hover': {
+                                            background: 'linear-gradient(45deg, #9575cd, #7986cb)'
+                                        },
+                                        flex: 1
+                                    }}
+                                >
+                                    Añadir a Google Wallet
+                                </Button>
+                            )}
+                            <Button
+                                variant="outlined"
+                                onClick={handleReset}
+                                sx={{ 
+                                    borderColor: '#404759',
+                                    color: '#b0b8c8',
+                                    '&:hover': {
+                                        borderColor: '#4a5568',
+                                        background: 'rgba(74, 85, 104, 0.1)'
+                                    },
+                                    flex: 1
+                                }}
+                            >
+                                Registrar otro cliente
+                            </Button>
+                        </Box>
+                    </Box>
                 </Paper>
             </Container>
         );

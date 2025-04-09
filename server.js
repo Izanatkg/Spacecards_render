@@ -163,8 +163,7 @@ async function createCustomerInLoyverse(customerData) {
         const finalCustomerData = {
             ...customerData,
             store_id: STORE_ID,
-            customer_code: customerCode,
-            total_points: WELCOME_POINTS
+            customer_code: customerCode
         };
         
         console.log('Creating customer in Loyverse:', finalCustomerData);
@@ -197,8 +196,7 @@ app.post('/api/register', async (req, res) => {
             name: name.trim(),
             email: email.trim(),
             phone_number: phone.trim(),
-            loyalty_program_enabled: true,
-            total_points: WELCOME_POINTS
+            loyalty_program_enabled: true
         };
 
         console.log('Enviando datos a Loyverse:', customerData);

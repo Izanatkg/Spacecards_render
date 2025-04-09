@@ -70,10 +70,10 @@ class GoogleWalletService {
         this.CLIENT_ID = process.env.CLIENT_ID;
         this.loyaltyClass = {
             "issuerName": process.env.ISSUER_NAME,
-            "programName": "Club Duelista",
+            "programName": "Space Pass",
             "programLogo": {
                 "sourceUri": {
-                    "uri": "https://i.imgur.com/FpqHJGe.png"
+                    "uri": "https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg"
                 }
             },
             "rewardsTier": "REWARDS_TIER_UNSPECIFIED",
@@ -89,7 +89,7 @@ class GoogleWalletService {
                         "columns": [
                             {
                                 "label": "Programa",
-                                "value": "Club Duelista"
+                                "value": "Space Pass"
                             }
                         ]
                     }
@@ -97,7 +97,7 @@ class GoogleWalletService {
             },
             "textModulesData": [
                 {
-                    "header": "Puntos de Duelo",
+                    "header": "Space Points",
                     "body": "0"
                 }
             ],
@@ -105,7 +105,7 @@ class GoogleWalletService {
                 "uris": [
                     {
                         "uri": "https://pokemon-loyalty-system.onrender.com",
-                        "description": "Visitar Tienda"
+                        "description": "Visitar Space Cards Store"
                     }
                 ]
             }
@@ -429,18 +429,18 @@ class GoogleWalletService {
             const loyaltyClass = {
                 'id': this.CLASS_ID,
                 'issuerName': this.ISSUER_NAME,
-                'programName': 'Space Cards',
+                'programName': 'Space Pass',
                 'programLogo': {
                     'kind': 'walletobjects#image',
                     'sourceUri': {
-                        'uri': 'https://i.ibb.co/DRXhM7V/space-cards-logo.png',
+                        'uri': 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
                         'description': 'Space Cards Logo'
                     }
                 },
                 'heroImage': {
                     'kind': 'walletobjects#image',
                     'sourceUri': {
-                        'uri': 'https://i.ibb.co/DRXhM7V/space-cards-logo.png',
+                        'uri': 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
                         'description': 'Space Cards Hero'
                     }
                 },
@@ -463,7 +463,7 @@ class GoogleWalletService {
                 },
                 'textModulesData': [
                     {
-                        'header': 'Puntos Espaciales',
+                        'header': 'Space Points',
                         'body': '0'
                     }
                 ],
@@ -471,7 +471,7 @@ class GoogleWalletService {
                     'uris': [
                         {
                             'uri': 'https://spacecards-loyalty.onrender.com',
-                            'description': 'Visitar Space Cards'
+                            'description': 'Visitar Space Cards Store'
                         }
                     ]
                 },
@@ -480,7 +480,7 @@ class GoogleWalletService {
                         'mainImage': {
                             'kind': 'walletobjects#image',
                             'sourceUri': {
-                                'uri': 'https://i.ibb.co/DRXhM7V/space-cards-logo.png',
+                                'uri': 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
                                 'description': 'Space Cards Background'
                             }
                         }

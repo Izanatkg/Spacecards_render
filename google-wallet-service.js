@@ -53,6 +53,13 @@ class GoogleWalletService {
             });
 
             this.credentials = credentials;
+            // Intentar crear la clase de lealtad si no existe
+            this.createOrUpdateLoyaltyClass().then(() => {
+                console.log('Clase de lealtad creada/actualizada correctamente');
+            }).catch(error => {
+                console.error('Error al crear/actualizar clase de lealtad:', error);
+            });
+
             console.log('Servicio de Google Wallet inicializado correctamente');
         } catch (error) {
             console.error('Error al inicializar el servicio de Google Wallet:', error);
@@ -416,6 +423,85 @@ class GoogleWalletService {
             }
         } catch (error) {
             console.error('Error detallado en createPass:', error);
+            throw error;
+        }
+    }
+    async createOrUpdateLoyaltyClass() {
+        try {
+            const loyaltyClass = {
+                id: this.CLASS_ID,
+                issuerName: {
+                    defaultValue: {
+                        language: 'es',
+                        value: this.ISSUER_NAME
+                    }
+                },
+                programName: {
+                    defaultValue: {
+                        language: 'es',
+                        value: 'Space Pass'
+                    }
+                },
+                programLogo: {
+                    sourceUri: {
+                        uri: 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
+                        description: 'Space Pass Logo'
+                    }
+                },
+                reviewStatus: 'UNDER_REVIEW',
+                hexBackgroundColor: '#1a1f2e',
+                hexForegroundColor: '#ffffff',
+                multipleDevicesAndHoldersAllowedStatus: 'MULTIPLE_HOLDERS',
+                infoModuleData: {
+                    labelValueRows: [
+                        {
+                            columns: [
+                                {
+                                    label: 'Programa',
+                                    value: 'Space Pass'
+                                }
+                            ]
+                        }
+                    ]
+                },
+                textModulesData: [
+                    {
+                        header: 'Puntos Espaciales',
+                        body: '0'
+                    }
+                ],
+                linksModuleData: {
+                    uris: [
+                        {
+                            uri: 'https://spacecards-loyalty.onrender.com',
+                            description: 'Visitar Tienda'
+                        }
+                    ]
+                }
+            };
+
+            try {
+                // Intentar obtener la clase existente
+                await this.client.loyaltyclass.get({ resourceId: this.CLASS_ID });
+                console.log('Clase de lealtad existente, actualizando...');
+                await this.client.loyaltyclass.update({
+                    resourceId: this.CLASS_ID,
+                    requestBody: loyaltyClass
+                });
+            } catch (error) {
+                if (error.code === 404) {
+                    console.log('Clase de lealtad no encontrada, creando nueva...');
+                    await this.client.loyaltyclass.insert({
+                        requestBody: loyaltyClass
+                    });
+                } else {
+                    throw error;
+                }
+            }
+
+            console.log('Clase de lealtad creada/actualizada exitosamente');
+        } catch (error) {
+            console.error('Error al crear/actualizar clase de lealtad:', error);
             throw error;
         }
     }

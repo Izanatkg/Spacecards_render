@@ -428,6 +428,8 @@ class GoogleWalletService {
     }
     async createOrUpdateLoyaltyClass() {
         try {
+            console.log('Iniciando createOrUpdateLoyaltyClass con CLASS_ID:', this.CLASS_ID);
+
             const loyaltyClass = {
                 'id': this.CLASS_ID,
                 'issuerName': {
@@ -484,20 +486,29 @@ class GoogleWalletService {
                 }
             };
 
+            console.log('Objeto loyaltyClass creado:', JSON.stringify(loyaltyClass, null, 2));
+
             try {
                 // Intentar obtener la clase existente
-                await this.client.loyaltyclass.get({ resourceId: this.CLASS_ID });
-                console.log('Clase de lealtad existente, actualizando...');
-                await this.client.loyaltyclass.update({
+                console.log('Intentando obtener clase existente...');
+                const existingClass = await this.client.loyaltyclass.get({ resourceId: this.CLASS_ID });
+                console.log('Clase existente encontrada:', existingClass);
+                
+                console.log('Actualizando clase existente...');
+                const updatedClass = await this.client.loyaltyclass.update({
                     resourceId: this.CLASS_ID,
                     requestBody: loyaltyClass
                 });
+                console.log('Clase actualizada exitosamente:', updatedClass);
             } catch (error) {
-                if (error.code === 404) {
-                    console.log('Clase de lealtad no encontrada, creando nueva...');
-                    await this.client.loyaltyclass.insert({
+                console.log('Error al obtener/actualizar clase:', error.response?.data || error);
+                
+                if (error.response?.status === 404) {
+                    console.log('Clase no encontrada, creando nueva...');
+                    const newClass = await this.client.loyaltyclass.insert({
                         requestBody: loyaltyClass
                     });
+                    console.log('Nueva clase creada exitosamente:', newClass);
                 } else {
                     throw error;
                 }

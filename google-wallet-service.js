@@ -182,33 +182,29 @@ class GoogleWalletService {
                 id: objectId,
                 classId: this.CLASS_ID,
                 state: 'ACTIVE',
-                accountId: email,
+                accountId: id,
                 accountName: name,
-                hexBackgroundColor: '#D4AF37',
-                logo: {
-                    sourceUri: {
-                        uri: 'https://i.imgur.com/FpqHJGe.png',
-                        description: 'SpaceCards Logo'
-                    }
+                loyaltyPoints: {
+                    balance: {
+                        string: points.toString()
+                    },
+                    label: 'Puntos'
                 },
-                header: {
-                    defaultValue: {
-                        language: 'es',
-                        value: 'Club Duelista'
-                    }
-                },
-                textModulesData: [
-                    {
-                        header: 'Puntos de Duelo',
-                        body: points ? points.toString() : '31.1'
-                    }
-                ],
                 barcode: {
                     type: 'QR_CODE',
                     value: id,
-                    alternateText: id,
-                    showCodeText: { kind: 'walletobjects#value', value: email }
-                }
+                    alternateText: id
+                },
+                textModulesData: [
+                    {
+                        header: 'Puntos',
+                        body: points.toString()
+                    },
+                    {
+                        header: 'Nivel',
+                        body: 'Duelista'
+                    }
+                ]
             };
 
             // Verificar si el objeto ya existe
@@ -432,20 +428,8 @@ class GoogleWalletService {
 
             const loyaltyClass = {
                 'id': this.CLASS_ID,
-                'issuerName': {
-                    'kind': 'walletobjects#localizedString',
-                    'defaultValue': {
-                        'language': 'es',
-                        'value': this.ISSUER_NAME
-                    }
-                },
-                'programName': {
-                    'kind': 'walletobjects#localizedString',
-                    'defaultValue': {
-                        'language': 'es',
-                        'value': 'Space Cards'
-                    }
-                },
+                'issuerName': this.ISSUER_NAME,
+                'programName': 'Space Cards',
                 'programLogo': {
                     'kind': 'walletobjects#image',
                     'sourceUri': {

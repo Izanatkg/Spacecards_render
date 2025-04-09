@@ -433,13 +433,20 @@ class GoogleWalletService {
                 'programLogo': {
                     'kind': 'walletobjects#image',
                     'sourceUri': {
-                        'uri': 'https://i.imgur.com/FpqHJGe.png',
+                        'uri': 'https://i.ibb.co/DRXhM7V/space-cards-logo.png',
                         'description': 'Space Cards Logo'
                     }
                 },
-                'reviewStatus': 'UNDER_REVIEW',
-                'hexBackgroundColor': '#D4AF37',
+                'heroImage': {
+                    'kind': 'walletobjects#image',
+                    'sourceUri': {
+                        'uri': 'https://i.ibb.co/DRXhM7V/space-cards-logo.png',
+                        'description': 'Space Cards Hero'
+                    }
+                },
+                'hexBackgroundColor': '#FFD700',
                 'hexForegroundColor': '#000000',
+                'reviewStatus': 'UNDER_REVIEW',
                 'allowMultipleUsersPerObject': true,
                 'locations': [],
                 'infoModuleData': {
@@ -473,7 +480,7 @@ class GoogleWalletService {
                         'mainImage': {
                             'kind': 'walletobjects#image',
                             'sourceUri': {
-                                'uri': 'https://i.imgur.com/FpqHJGe.png',
+                                'uri': 'https://i.ibb.co/DRXhM7V/space-cards-logo.png',
                                 'description': 'Space Cards Background'
                             }
                         }

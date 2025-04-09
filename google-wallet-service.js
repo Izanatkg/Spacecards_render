@@ -443,19 +443,19 @@ class GoogleWalletService {
                     'kind': 'walletobjects#localizedString',
                     'defaultValue': {
                         'language': 'es',
-                        'value': 'Space Pass'
+                        'value': 'Space Cards'
                     }
                 },
                 'programLogo': {
                     'kind': 'walletobjects#image',
                     'sourceUri': {
-                        'uri': 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
-                        'description': 'Space Pass Logo'
+                        'uri': 'https://i.imgur.com/FpqHJGe.png',
+                        'description': 'Space Cards Logo'
                     }
                 },
                 'reviewStatus': 'UNDER_REVIEW',
-                'hexBackgroundColor': '#1a1f2e',
-                'hexForegroundColor': '#ffffff',
+                'hexBackgroundColor': '#D4AF37',
+                'hexForegroundColor': '#000000',
                 'allowMultipleUsersPerObject': true,
                 'locations': [],
                 'infoModuleData': {
@@ -480,10 +480,21 @@ class GoogleWalletService {
                     'uris': [
                         {
                             'uri': 'https://spacecards-loyalty.onrender.com',
-                            'description': 'Visitar Tienda'
+                            'description': 'Visitar Space Cards'
                         }
                     ]
-                }
+                },
+                'imageModulesData': [
+                    {
+                        'mainImage': {
+                            'kind': 'walletobjects#image',
+                            'sourceUri': {
+                                'uri': 'https://i.imgur.com/FpqHJGe.png',
+                                'description': 'Space Cards Background'
+                            }
+                        }
+                    }
+                ]
             };
 
             console.log('Objeto loyaltyClass creado:', JSON.stringify(loyaltyClass, null, 2));

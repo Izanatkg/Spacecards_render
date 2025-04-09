@@ -3,7 +3,7 @@ const { GoogleAuth } = require('google-auth-library');
 
 // Usar variables de entorno o valores por defecto
 const ISSUER_ID = process.env.ISSUER_ID || '3388000000022884108';
-const CLASS_ID = process.env.CLASS_ID || `${ISSUER_ID}.yugioh_loyalty_card_v2`;
+const CLASS_ID = process.env.CLASS_ID || `${ISSUER_ID}.pokemon_loyalty_card`;
 
 let credentials;
 try {

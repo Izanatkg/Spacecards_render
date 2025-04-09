@@ -429,52 +429,56 @@ class GoogleWalletService {
     async createOrUpdateLoyaltyClass() {
         try {
             const loyaltyClass = {
-                id: this.CLASS_ID,
-                issuerName: {
-                    defaultValue: {
-                        language: 'es',
-                        value: this.ISSUER_NAME
+                'id': this.CLASS_ID,
+                'issuerName': {
+                    'kind': 'walletobjects#localizedString',
+                    'defaultValue': {
+                        'language': 'es',
+                        'value': this.ISSUER_NAME
                     }
                 },
-                programName: {
-                    defaultValue: {
-                        language: 'es',
-                        value: 'Space Pass'
+                'programName': {
+                    'kind': 'walletobjects#localizedString',
+                    'defaultValue': {
+                        'language': 'es',
+                        'value': 'Space Pass'
                     }
                 },
-                programLogo: {
-                    sourceUri: {
-                        uri: 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
-                        description: 'Space Pass Logo'
+                'programLogo': {
+                    'kind': 'walletobjects#image',
+                    'sourceUri': {
+                        'uri': 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
+                        'description': 'Space Pass Logo'
                     }
                 },
-                reviewStatus: 'UNDER_REVIEW',
-                hexBackgroundColor: '#1a1f2e',
-                hexForegroundColor: '#ffffff',
-                multipleDevicesAndHoldersAllowedStatus: 'MULTIPLE_HOLDERS',
-                infoModuleData: {
-                    labelValueRows: [
+                'reviewStatus': 'UNDER_REVIEW',
+                'hexBackgroundColor': '#1a1f2e',
+                'hexForegroundColor': '#ffffff',
+                'allowMultipleUsersPerObject': true,
+                'locations': [],
+                'infoModuleData': {
+                    'labelValueRows': [
                         {
-                            columns: [
+                            'columns': [
                                 {
-                                    label: 'Programa',
-                                    value: 'Space Pass'
+                                    'label': 'Programa',
+                                    'value': 'Space Pass'
                                 }
                             ]
                         }
                     ]
                 },
-                textModulesData: [
+                'textModulesData': [
                     {
-                        header: 'Puntos Espaciales',
-                        body: '0'
+                        'header': 'Puntos Espaciales',
+                        'body': '0'
                     }
                 ],
-                linksModuleData: {
-                    uris: [
+                'linksModuleData': {
+                    'uris': [
                         {
-                            uri: 'https://spacecards-loyalty.onrender.com',
-                            description: 'Visitar Tienda'
+                            'uri': 'https://spacecards-loyalty.onrender.com',
+                            'description': 'Visitar Tienda'
                         }
                     ]
                 }

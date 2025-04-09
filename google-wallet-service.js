@@ -8,7 +8,7 @@ const { google } = require('googleapis');
 class GoogleWalletService {
     constructor() {
         // Valores por defecto para el entorno de desarrollo
-        this.CLASS_ID = process.env.CLASS_ID || '3388000000022884108.pokemon_loyalty_card';
+        this.CLASS_ID = process.env.CLASS_ID || '3388000000022884108.yugioh_loyalty_card_v2';
         this.ISSUER_ID = process.env.ISSUER_ID || '3388000000022884108';
         this.ISSUER_NAME = process.env.ISSUER_NAME || 'Mamitas Tepic';
         this.PROGRAM_NAME = process.env.PROGRAM_NAME || 'Club Duelista';

@@ -73,23 +73,23 @@ class GoogleWalletService {
             "programName": "Space Pass",
             "programLogo": {
                 "sourceUri": {
-                    "uri": "https://raw.githubusercontent.com/Izanatkg/Spacecards_render/main/client-new/public/stellar-cadet-logo.png"
+                    "uri": "https://raw.githubusercontent.com/Izanatkg/Spacecards_render/main/client-new/public/space-pass-logo.png"
                 }
             },
             "rewardsTier": "REWARDS_TIER_UNSPECIFIED",
             "reviewStatus": "REVIEW_STATUS_UNSPECIFIED",
             "id": this.CLASS_ID,
             "version": "1",
-            "hexBackgroundColor": "#FFD700",
-            "hexFontColor": "#000000",
+            "hexBackgroundColor": "#1a1f2e",
+            "hexFontColor": "#8e9dff",
             "multipleDevicesAndHoldersAllowedStatus": "STATUS_UNSPECIFIED",
             "infoModuleData": {
                 "labelValueRows": [
                     {
                         "columns": [
                             {
-                                "label": "Programa",
-                                "value": "Space Pass"
+                                "label": "Monedero Electrónico Space Pass",
+                                "value": "Acumula y Disfruta"
                             }
                         ]
                     }
@@ -104,7 +104,7 @@ class GoogleWalletService {
             "linksModuleData": {
                 "uris": [
                     {
-                        "uri": "https://pokemon-loyalty-system.onrender.com",
+                        "uri": "https://space-pass-nq9e0cv.gamma.site",
                         "description": "Visitar Space Pass"
                     }
                 ]
@@ -193,7 +193,9 @@ class GoogleWalletService {
                 barcode: {
                     type: 'QR_CODE',
                     value: id,
-                    alternateText: id
+                    alternateText: id,
+                    showCodeText: { type: 'TEXT' },
+                    alignment: 'CENTER'
                 },
                 textModulesData: [
                     {

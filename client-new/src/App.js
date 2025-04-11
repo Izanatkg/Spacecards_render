@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Navbar from './components/Navbar';
-import Home from './pages/Home';
 import Register from './pages/Register';
 import { AuthProvider } from './contexts/AuthContext';
 
@@ -78,8 +77,7 @@ function App() {
         <Router>
           <Navbar />
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/" element={<Register />} />
           </Routes>
         </Router>
       </ThemeProvider>

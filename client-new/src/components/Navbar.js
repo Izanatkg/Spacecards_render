@@ -12,7 +12,12 @@ function Navbar() {
             <Toolbar>
                 <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
                     <RocketLaunchIcon sx={{ mr: 1 }} />
-                    <Typography variant="h6" component={Link} to="/" sx={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Typography 
+                        variant="h6" 
+                        component="a" 
+                        href="https://space-pass-nq9e0cv.gamma.site/" 
+                        sx={{ textDecoration: 'none', color: 'inherit' }}
+                    >
                         Space Pass
                     </Typography>
                 </Box>

@@ -1,3 +1,4 @@
+# Trigger redeploy: 2025-04-10
 services:
   - type: web
     name: spacecards-loyalty
@@ -12,4 +13,8 @@ services:
       - key: STORE_ID
         value: b7e82499-21b0-4e9d-aae5-16d90693c77a
       - key: WELCOME_POINTS
-        value: 100
+        value: 10
+      - key: ISSUER_NAME
+        value: Space Pass
+      - key: PROGRAM_NAME
+        value: Space Pass

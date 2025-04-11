@@ -80,8 +80,8 @@ class GoogleWalletService {
             "reviewStatus": "REVIEW_STATUS_UNSPECIFIED",
             "id": this.CLASS_ID,
             "version": "1",
-            "hexBackgroundColor": "#1a1f2e",
-            "hexFontColor": "#FFFFFF",
+            "hexBackgroundColor": "#FFD700",
+            "hexFontColor": "#000000",
             "multipleDevicesAndHoldersAllowedStatus": "STATUS_UNSPECIFIED",
             "infoModuleData": {
                 "labelValueRows": [
@@ -105,7 +105,7 @@ class GoogleWalletService {
                 "uris": [
                     {
                         "uri": "https://pokemon-loyalty-system.onrender.com",
-                        "description": "Visitar Space Cards Store"
+                        "description": "Visitar Space Pass"
                     }
                 ]
             }
@@ -188,7 +188,7 @@ class GoogleWalletService {
                     balance: {
                         string: points.toString()
                     },
-                    label: 'Puntos'
+                    label: 'Space Points'
                 },
                 barcode: {
                     type: 'QR_CODE',
@@ -197,12 +197,8 @@ class GoogleWalletService {
                 },
                 textModulesData: [
                     {
-                        header: 'Puntos',
+                        header: 'Space Points',
                         body: points.toString()
-                    },
-                    {
-                        header: 'Nivel',
-                        body: 'Duelista'
                     }
                 ]
             };

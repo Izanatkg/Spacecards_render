@@ -129,6 +129,20 @@ class GoogleWalletService {
             console.log('Creating new loyalty class...');
             const token = await this.getAuthToken();
             
+            // Forzar eliminación de la clase existente
+            try {
+                const deleteUrl = `${this.baseUrl}/loyaltyClass/${this.CLASS_ID}`;
+                console.log('Attempting to delete existing class:', deleteUrl);
+                await axios.delete(deleteUrl, {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                console.log('Successfully deleted existing loyalty class');
+            } catch (deleteError) {
+                console.log('No existing class to delete or error:', deleteError.message);
+            }
+            
             // Intentar eliminar la clase existente primero
             try {
                 await axios.delete(
@@ -184,6 +198,7 @@ class GoogleWalletService {
                 state: 'ACTIVE',
                 accountId: id,
                 accountName: name,
+                issuerName: this.ISSUER_NAME,
                 loyaltyPoints: {
                     balance: {
                         string: points.toString()
@@ -197,12 +212,26 @@ class GoogleWalletService {
                     showCodeText: { type: 'TEXT' },
                     alignment: 'CENTER'
                 },
+                hexBackgroundColor: '#1a1f2e',
+                hexFontColor: '#ffd700',
                 textModulesData: [
                     {
                         header: 'Space Points',
                         body: points.toString()
                     }
-                ]
+                ],
+                infoModuleData: {
+                    labelValueRows: [
+                        {
+                            columns: [
+                                {
+                                    label: 'Monedero Electrónico Space Pass',
+                                    value: 'Acumula y Disfruta'
+                                }
+                            ]
+                        }
+                    ]
+                }
             };
 
             // Verificar si el objeto ya existe

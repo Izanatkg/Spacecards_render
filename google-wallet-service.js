@@ -70,7 +70,19 @@ class GoogleWalletService {
         this.CLIENT_ID = process.env.CLIENT_ID;
         this.loyaltyClass = {
             "issuerName": process.env.ISSUER_NAME,
+            "localizedIssuerName": {
+                "defaultValue": {
+                    "language": "es",
+                    "value": process.env.ISSUER_NAME
+                }
+            },
             "programName": "Space Pass",
+            "localizedProgramName": {
+                "defaultValue": {
+                    "language": "es",
+                    "value": "Space Pass"
+                }
+            },
 
             "rewardsTier": "REWARDS_TIER_UNSPECIFIED",
             "reviewStatus": "REVIEW_STATUS_UNSPECIFIED",
@@ -221,7 +233,13 @@ class GoogleWalletService {
                 issuerName: this.ISSUER_NAME,
                 loyaltyPoints: {
                     balance: {
-                        string: points.toString()
+                        string: points.toString(),
+                        localizedString: {
+                            defaultValue: {
+                                language: 'es',
+                                value: points.toString()
+                            }
+                        }
                     },
                     label: 'Space Points',
                     localizedLabel: {
@@ -235,6 +253,12 @@ class GoogleWalletService {
                     type: 'QR_CODE',
                     value: id,
                     alternateText: id,
+                    localizedAlternateText: {
+                        defaultValue: {
+                            language: 'es',
+                            value: id
+                        }
+                    },
                     showCodeText: { type: 'TEXT' },
                     alignment: 'CENTER'
                 },

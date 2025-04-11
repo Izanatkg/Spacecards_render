@@ -85,7 +85,19 @@ class GoogleWalletService {
                         "columns": [
                             {
                                 "label": "Monedero Electrónico Space Pass",
-                                "value": "Acumula y Disfruta"
+                                "localizedLabel": {
+                                    "defaultValue": {
+                                        "language": "es",
+                                        "value": "Monedero Electrónico Space Pass"
+                                    }
+                                },
+                                "value": "Acumula y Disfruta",
+                                "localizedValue": {
+                                    "defaultValue": {
+                                        "language": "es",
+                                        "value": "Acumula y Disfruta"
+                                    }
+                                }
                             }
                         ]
                     }
@@ -94,7 +106,19 @@ class GoogleWalletService {
             "textModulesData": [
                 {
                     "header": "Space Points",
-                    "body": "0"
+                    "localizedHeader": {
+                        "defaultValue": {
+                            "language": "es",
+                            "value": "Space Points"
+                        }
+                    },
+                    "body": "0",
+                    "localizedBody": {
+                        "defaultValue": {
+                            "language": "es",
+                            "value": "0"
+                        }
+                    }
                 }
             ],
             "linksModuleData": {
@@ -357,7 +381,19 @@ class GoogleWalletService {
                 textModulesData: [
                     {
                         header: "Space Points",
-                        body: points.toString()
+                        localizedHeader: {
+                            defaultValue: {
+                                language: "es",
+                                value: "Space Points"
+                            }
+                        },
+                        body: points.toString(),
+                        localizedBody: {
+                            defaultValue: {
+                                language: "es",
+                                value: points.toString()
+                            }
+                        }
                     }
                 ],
                 linksModuleData: {
@@ -380,7 +416,19 @@ class GoogleWalletService {
                             columns: [
                                 {
                                     label: "Monedero Electrónico Space Pass",
-                                    value: "Acumula y Disfruta"
+                                    localizedLabel: {
+                                        defaultValue: {
+                                            language: "es",
+                                            value: "Monedero Electrónico Space Pass"
+                                        }
+                                    },
+                                    value: "Acumula y Disfruta",
+                                    localizedValue: {
+                                        defaultValue: {
+                                            language: "es",
+                                            value: "Acumula y Disfruta"
+                                        }
+                                    }
                                 }
                             ]
                         }

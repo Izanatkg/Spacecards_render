@@ -11,7 +11,7 @@ class GoogleWalletService {
         this.CLASS_ID = process.env.CLASS_ID || '3388000000022884108.pokemon_loyalty_card';
         this.ISSUER_ID = process.env.ISSUER_ID || '3388000000022884108';
         this.ISSUER_NAME = process.env.ISSUER_NAME || 'Mamitas Tepic';
-        this.PROGRAM_NAME = process.env.PROGRAM_NAME || 'Club Duelista';
+        this.PROGRAM_NAME = process.env.PROGRAM_NAME || 'Space Pass';
         this.PROGRAM_LOGO = process.env.PROGRAM_LOGO || 'https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg';
 
         // Cargar credenciales
@@ -73,14 +73,14 @@ class GoogleWalletService {
             "programName": "Space Pass",
             "programLogo": {
                 "sourceUri": {
-                    "uri": "https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg"
+                    "uri": "https://raw.githubusercontent.com/Izanatkg/Spacecards_render/main/client-new/public/stellar-cadet-logo.png"
                 }
             },
             "rewardsTier": "REWARDS_TIER_UNSPECIFIED",
             "reviewStatus": "REVIEW_STATUS_UNSPECIFIED",
             "id": this.CLASS_ID,
             "version": "1",
-            "hexBackgroundColor": "#D4AF37",
+            "hexBackgroundColor": "#1a1f2e",
             "hexFontColor": "#FFFFFF",
             "multipleDevicesAndHoldersAllowedStatus": "STATUS_UNSPECIFIED",
             "infoModuleData": {

@@ -71,11 +71,7 @@ class GoogleWalletService {
         this.loyaltyClass = {
             "issuerName": process.env.ISSUER_NAME,
             "programName": "Space Pass",
-            "programLogo": {
-                "sourceUri": {
-                    "uri": "https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg"
-                }
-            },
+
             "rewardsTier": "REWARDS_TIER_UNSPECIFIED",
             "reviewStatus": "REVIEW_STATUS_UNSPECIFIED",
             "id": this.CLASS_ID,
@@ -351,12 +347,12 @@ class GoogleWalletService {
                 hexBackgroundColor: "#1a1f2e",
                 hexFontColor: "#ffd700",
                 issuerName: this.ISSUER_NAME,
-                heroImage: {
-                    kind: "walletobjects#image",
-                    sourceUri: {
-                        uri: "https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg",
-                        description: "Space Pass Logo"
-                    }
+                barcode: {
+                    type: 'QR_CODE',
+                    value: customerId,
+                    alternateText: customerId,
+                    showCodeText: { type: 'TEXT' },
+                    alignment: 'CENTER'
                 },
                 textModulesData: [
                     {

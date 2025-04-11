@@ -22,7 +22,8 @@ const LOYVERSE_TOKEN = '68c66646696548af983a2a0b8e64c2ec';
 const LOYVERSE_API_URL = 'https://api.loyverse.com/v1.0';
 const LOYVERSE_API_BASE = LOYVERSE_API_URL;
 const COUNTER_FILE = path.join(__dirname, 'customer_counter.txt');
-const WELCOME_POINTS = 100; // Puntos de bienvenida
+const WELCOME_POINTS = 10; // Puntos de bienvenida
+const POINTS_RATIO = 0.02; // Puntos por cada 100 de compra
 const STORE_ID = 'b7e82499-21b0-4e9d-aae5-16d90693c77a';
 
 // Función para obtener y actualizar el contador de clientes
@@ -102,15 +103,23 @@ loyverseApi.get('/stores')
 // Función para añadir puntos a un cliente en Loyverse
 async function addPointsToCustomer(customerId, points) {
     try {
-        console.log(`Adding ${points} points to customer ${customerId}`);
+        console.log(`Adding points to customer ${customerId}`);
         
+        // Calcular puntos basado en la compra (si es una compra)
+        let finalPoints = points;
+        if (points > 0 && points !== WELCOME_POINTS) {
+            // Si no son puntos de bienvenida, calcular basado en el ratio
+            finalPoints = Math.floor((points / 100) * POINTS_RATIO * 100) / 100;
+        }
+        console.log(`Calculated points: ${finalPoints} (from original: ${points})`);
+
         // Crear una transacción de puntos usando el endpoint de mercancías
         const transactionResponse = await loyverseApi.post('/merchandise_points', {
             customer_id: customerId,
-            points: points,
+            points: finalPoints,
             store_id: STORE_ID,
             type: 'EARNING',
-            description: "Puntos de bienvenida"
+            description: "Space Points"
         });
 
         console.log('Points transaction response:', transactionResponse.data);

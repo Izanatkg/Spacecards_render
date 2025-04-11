@@ -10,7 +10,7 @@ class GoogleWalletService {
         // Valores por defecto para el entorno de desarrollo
         this.CLASS_ID = process.env.CLASS_ID || '3388000000022884108.pokemon_loyalty_card';
         this.ISSUER_ID = process.env.ISSUER_ID || '3388000000022884108';
-        this.ISSUER_NAME = process.env.ISSUER_NAME || 'Mamitas Tepic';
+        this.ISSUER_NAME = process.env.ISSUER_NAME || 'Space Pass';
         this.PROGRAM_NAME = process.env.PROGRAM_NAME || 'Space Pass';
         this.PROGRAM_LOGO = process.env.PROGRAM_LOGO || 'https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg';
 
@@ -81,7 +81,7 @@ class GoogleWalletService {
             "id": this.CLASS_ID,
             "version": "1",
             "hexBackgroundColor": "#1a1f2e",
-            "hexFontColor": "#8e9dff",
+            "hexFontColor": "#ffd700",
             "multipleDevicesAndHoldersAllowedStatus": "STATUS_UNSPECIFIED",
             "infoModuleData": {
                 "labelValueRows": [

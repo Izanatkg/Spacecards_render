@@ -230,14 +230,20 @@ class GoogleWalletService {
                 state: 'ACTIVE',
                 accountId: id,
                 accountName: name,
+                localizedAccountName: {
+                    defaultValue: {
+                        language: 'es',
+                        value: name
+                    }
+                },
                 issuerName: this.ISSUER_NAME,
                 loyaltyPoints: {
                     balance: {
-                        string: points.toString(),
+                        int: Math.floor(points),
                         localizedString: {
                             defaultValue: {
                                 language: 'es',
-                                value: points.toString()
+                                value: Math.floor(points).toString()
                             }
                         }
                     },

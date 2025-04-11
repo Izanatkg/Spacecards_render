@@ -348,53 +348,52 @@ class GoogleWalletService {
                 id: `${this.ISSUER_ID}.${customerId}`,
                 classId: this.CLASS_ID,
                 state: "ACTIVE",
-                hexBackgroundColor: "#D4AF37",
-                hexFontColor: "#FFFFFF",
+                hexBackgroundColor: "#1a1f2e",
+                hexFontColor: "#ffd700",
+                issuerName: this.ISSUER_NAME,
                 heroImage: {
                     kind: "walletobjects#image",
                     sourceUri: {
-                        uri: "https://i.imgur.com/FpqHJGe.png",
-                        description: "Club Duelista Logo"
+                        uri: "https://raw.githubusercontent.com/Izanatkg/Spacecards_render/main/client-new/public/space-pass-logo.png",
+                        description: "Space Pass Logo"
                     }
                 },
                 textModulesData: [
                     {
-                        header: "Puntos de Duelo",
+                        header: "Space Points",
                         body: points.toString()
-                    },
-                    {
-                        header: "Nivel",
-                        body: "Duelista"
                     }
                 ],
                 linksModuleData: {
                     uris: [
                         {
-                            uri: "https://spacecards-loyalty.onrender.com",
-                            description: "Visítanos",
+                            uri: "https://space-pass-nq9e0cv.gamma.site",
+                            description: "Visitar Space Pass",
                             localizedDescription: {
                                 defaultValue: {
                                     language: "es",
-                                    value: "Visítanos"
+                                    value: "Visitar Space Pass"
                                 }
                             }
-                        },
+                        }
+                    ]
+                },
+                infoModuleData: {
+                    labelValueRows: [
                         {
-                            uri: "https://spacecards-loyalty.onrender.com/tienda",
-                            description: "Visitar Tienda",
-                            localizedDescription: {
-                                defaultValue: {
-                                    language: "es",
-                                    value: "Visitar Tienda"
+                            columns: [
+                                {
+                                    label: "Monedero Electrónico Space Pass",
+                                    value: "Acumula y Disfruta"
                                 }
-                            }
+                            ]
                         }
                     ]
                 },
                 accountId: customerId,
                 accountName: customerName,
                 loyaltyPoints: {
-                    label: "Puntos de Duelo",
+                    label: "Space Points",
                     balance: {
                         string: points.toString()
                     }

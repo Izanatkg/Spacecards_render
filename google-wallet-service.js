@@ -375,7 +375,13 @@ class GoogleWalletService {
                     requestBody: {
                         loyaltyPoints: {
                             balance: {
-                                int: Math.floor(points)
+                                int: Math.floor(points),
+                                localizedString: {
+                                    defaultValue: {
+                                        language: 'es',
+                                        value: Math.floor(points).toString()
+                                    }
+                                }
                             }
                         }
                     }
@@ -425,10 +431,22 @@ class GoogleWalletService {
                 hexBackgroundColor: "#1a1f2e",
                 hexFontColor: "#ffd700",
                 issuerName: this.ISSUER_NAME,
+                localizedIssuerName: {
+                    defaultValue: {
+                        language: 'es',
+                        value: this.ISSUER_NAME
+                    }
+                },
                 barcode: {
                     type: 'QR_CODE',
                     value: customerId,
                     alternateText: customerId,
+                    localizedAlternateText: {
+                        defaultValue: {
+                            language: 'es',
+                            value: customerId
+                        }
+                    },
                     showCodeText: { type: 'TEXT' },
                     alignment: 'CENTER'
                 },

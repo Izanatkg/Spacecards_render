@@ -223,7 +223,13 @@ class GoogleWalletService {
                     balance: {
                         string: points.toString()
                     },
-                    label: 'Space Points'
+                    label: 'Space Points',
+                    localizedLabel: {
+                        defaultValue: {
+                            language: 'es',
+                            value: 'Space Points'
+                        }
+                    }
                 },
                 barcode: {
                     type: 'QR_CODE',
@@ -237,7 +243,19 @@ class GoogleWalletService {
                 textModulesData: [
                     {
                         header: 'Space Points',
-                        body: points.toString()
+                        localizedHeader: {
+                            defaultValue: {
+                                language: 'es',
+                                value: 'Space Points'
+                            }
+                        },
+                        body: points.toString(),
+                        localizedBody: {
+                            defaultValue: {
+                                language: 'es',
+                                value: points.toString()
+                            }
+                        }
                     }
                 ],
                 infoModuleData: {
@@ -246,7 +264,19 @@ class GoogleWalletService {
                             columns: [
                                 {
                                     label: 'Monedero Electrónico Space Pass',
-                                    value: 'Acumula y Disfruta'
+                                    localizedLabel: {
+                                        defaultValue: {
+                                            language: 'es',
+                                            value: 'Monedero Electrónico Space Pass'
+                                        }
+                                    },
+                                    value: 'Acumula y Disfruta',
+                                    localizedValue: {
+                                        defaultValue: {
+                                            language: 'es',
+                                            value: 'Acumula y Disfruta'
+                                        }
+                                    }
                                 }
                             ]
                         }

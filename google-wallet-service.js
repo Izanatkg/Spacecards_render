@@ -79,6 +79,8 @@ class GoogleWalletService {
             "hexBackgroundColor": "#1a1f2e",
             "hexFontColor": "#ffd700",
             "multipleDevicesAndHoldersAllowedStatus": "STATUS_UNSPECIFIED",
+            "enableSmartTap": true,
+            "redemptionIssuers": [this.ISSUER_ID],
             "infoModuleData": {
                 "labelValueRows": [
                     {
@@ -207,7 +209,14 @@ class GoogleWalletService {
                     alternateText: id,
                     showCodeText: { type: 'TEXT' },
                     alignment: 'CENTER',
-                    renderEncoded: true
+                    renderEncoded: true,
+                    valueDisplayed: true
+                },
+                cardTitle: {
+                    defaultValue: {
+                        language: 'es',
+                        value: 'Space Pass'
+                    }
                 },
                 hexBackgroundColor: '#1a1f2e',
                 hexFontColor: '#ffd700',

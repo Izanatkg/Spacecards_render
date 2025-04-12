@@ -117,13 +117,16 @@ async function addPointsToCustomer(customerId, points) {
         }
         console.log(`Calculated points: ${finalPoints} (from original: ${points})`);
 
-        // Actualizar los puntos directamente en el cliente
-        const updateResponse = await loyverseApi.post(`/customers/${customerId}/add_points`, {
+        // Crear una transacción de puntos usando el endpoint de mercancías
+        const transactionResponse = await loyverseApi.post('/merchandise_points', {
+            customer_id: customerId,
             points: finalPoints,
-            store_id: STORE_ID
+            store_id: STORE_ID,
+            type: 'EARNING',
+            description: "Puntos de bienvenida"
         });
 
-        console.log('Points update response:', updateResponse.data);
+        console.log('Points transaction response:', transactionResponse.data);
         
         // Esperar un momento para que los puntos se actualicen
         await new Promise(resolve => setTimeout(resolve, 2000));

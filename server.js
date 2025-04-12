@@ -100,10 +100,47 @@ loyverseApi.get('/stores')
         console.error('Error connecting to Loyverse:', error.response?.data || error.message);
     });
 
+// Función para obtener los tipos de pago disponibles
+async function getPaymentTypes() {
+    try {
+        const response = await loyverseApi.get('/payment_types');
+        return response.data.payment_types;
+    } catch (error) {
+        console.error('Error getting payment types:', error.response?.data || error);
+        throw error;
+    }
+}
+
+// Variable global para almacenar el ID del tipo de pago en efectivo
+let CASH_PAYMENT_TYPE_ID = null;
+
+// Función para inicializar el ID del tipo de pago en efectivo
+async function initializeCashPaymentType() {
+    try {
+        const paymentTypes = await getPaymentTypes();
+        console.log('Available payment types:', paymentTypes);
+        const cashPaymentType = paymentTypes.find(type => type.name.toLowerCase() === 'cash');
+        if (cashPaymentType) {
+            CASH_PAYMENT_TYPE_ID = cashPaymentType.id;
+            console.log('Cash payment type ID initialized:', CASH_PAYMENT_TYPE_ID);
+        } else {
+            throw new Error('Cash payment type not found');
+        }
+    } catch (error) {
+        console.error('Error initializing cash payment type:', error);
+        throw error;
+    }
+}
+
 // Función para añadir puntos a un cliente en Loyverse
 async function addPointsToCustomer(customerId, points) {
     try {
         console.log(`Adding points to customer ${customerId}`);
+        
+        // Asegurarse de que tenemos el ID del tipo de pago en efectivo
+        if (!CASH_PAYMENT_TYPE_ID) {
+            await initializeCashPaymentType();
+        }
         
         // Obtener los puntos actuales del cliente
         const currentCustomer = await loyverseApi.get(`/customers/${customerId}`);
@@ -129,7 +166,7 @@ async function addPointsToCustomer(customerId, points) {
             receipt_type: "SALE",
             payments: [
                 {
-                    payment_type_id: "1", // 1 es el ID por defecto para pagos en efectivo en Loyverse
+                    payment_type_id: CASH_PAYMENT_TYPE_ID,
                     amount_money: finalPoints * 100
                 }
             ]

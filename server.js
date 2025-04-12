@@ -118,8 +118,9 @@ async function addPointsToCustomer(customerId, points) {
         console.log(`Calculated points: ${finalPoints} (from original: ${points})`);
 
         // Actualizar los puntos directamente en el cliente
-        const updateResponse = await loyverseApi.put(`/customers/${customerId}`, {
-            total_points: currentPoints + finalPoints
+        const updateResponse = await loyverseApi.post(`/customers/${customerId}/add_points`, {
+            points: finalPoints,
+            store_id: STORE_ID
         });
 
         console.log('Points update response:', updateResponse.data);

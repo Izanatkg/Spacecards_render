@@ -69,30 +69,26 @@ class GoogleWalletService {
         this.baseUrl = 'https://walletobjects.googleapis.com/walletobjects/v1';
         this.CLIENT_ID = process.env.CLIENT_ID;
         this.loyaltyClass = {
-            "issuerName": process.env.ISSUER_NAME,
-            "programName": "Space Pass",
-
-            "rewardsTier": "REWARDS_TIER_UNSPECIFIED",
-            "reviewStatus": "REVIEW_STATUS_UNSPECIFIED",
             "id": this.CLASS_ID,
+            "issuerName": "Space Pass",
+            "programName": "Space Pass",
+            "programLogo": {},
+            "reviewStatus": "REVIEW_STATUS_UNSPECIFIED",
             "version": "1",
             "hexBackgroundColor": "#FFD700",
             "hexFontColor": "#000000",
             "multipleDevicesAndHoldersAllowedStatus": "STATUS_UNSPECIFIED",
-            "enableSmartTap": true,
-            "redemptionIssuers": [this.ISSUER_ID],
-            "infoModuleData": {
-                "labelValueRows": [
-                    {
-                        "columns": [
-                            {
-                                "label": "Monedero Electrónico Space Pass",
-                                "value": "Acumula y Disfruta"
-                            }
-                        ]
-                    }
-                ]
-            },
+            "messages": [
+                {
+                    "header": "Bienvenido a Space Pass",
+                    "body": "Escanea este código para acumular puntos"
+                }
+            ],
+            "locations": [],
+            "accountIdLabel": "ID de Cliente",
+            "accountNameLabel": "Nombre",
+            "rewardsTier": "REWARDS_TIER_UNSPECIFIED",
+            "secondaryLoyaltyPoints": [],
             "textModulesData": [
                 {
                     "header": "Space Points",
@@ -103,7 +99,8 @@ class GoogleWalletService {
                 "uris": [
                     {
                         "uri": "https://space-pass-nq9e0cv.gamma.site",
-                        "description": "Visitar Space Pass"
+                        "description": "Visitar Space Pass",
+                        "id": "website"
                     }
                 ]
             }
@@ -354,10 +351,23 @@ class GoogleWalletService {
                 id: `${this.ISSUER_ID}.${customerId}`,
                 classId: this.CLASS_ID,
                 state: "ACTIVE",
+                barcode: {
+                    type: "QR_CODE",
+                    value: customerId,
+                    alternateText: customerId,
+                    renderEncoded: true
+                },
                 hexBackgroundColor: "#FFD700",
                 hexFontColor: "#000000",
                 issuerName: this.ISSUER_NAME,
-
+                accountId: customerId,
+                accountName: customerName,
+                points: {
+                    balance: {
+                        int: points
+                    },
+                    label: "Space Points"
+                },
                 textModulesData: [
                     {
                         header: "Space Points",
@@ -369,12 +379,7 @@ class GoogleWalletService {
                         {
                             uri: "https://space-pass-nq9e0cv.gamma.site",
                             description: "Visitar Space Pass",
-                            localizedDescription: {
-                                defaultValue: {
-                                    language: "es",
-                                    value: "Visitar Space Pass"
-                                }
-                            }
+                            id: "website"
                         }
                     ]
                 },

@@ -129,7 +129,7 @@ async function addPointsToCustomer(customerId, points) {
             receipt_type: "SALE",
             payments: [
                 {
-                    type: "CASH",
+                    payment_type_id: "1", // 1 es el ID por defecto para pagos en efectivo en Loyverse
                     amount_money: finalPoints * 100
                 }
             ]

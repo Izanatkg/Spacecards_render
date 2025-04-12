@@ -203,15 +203,22 @@ class GoogleWalletService {
                     type: 'QR_CODE',
                     value: id,
                     alternateText: id,
-                    showCodeText: { type: 'TEXT' },
+                    showCodeText: { 
+                        kind: 'walletobjects#localizedString',
+                        defaultValue: {
+                            language: 'es',
+                            value: 'Código de Cliente'
+                        }
+                    },
                     alignment: 'CENTER',
                     renderEncoded: true,
                     valueDisplayed: true
                 },
                 cardTitle: {
+                    kind: 'walletobjects#localizedString',
                     defaultValue: {
                         language: 'es',
-                        value: 'Space Pass'
+                        value: 'Space Pass Loyalty Card'
                     }
                 },
                 hexBackgroundColor: '#1a1f2e',
@@ -460,7 +467,13 @@ class GoogleWalletService {
                 'id': this.CLASS_ID,
                 'issuerName': this.ISSUER_NAME,
                 'programName': 'Space Pass',
-
+                'programLogo': {
+                    'kind': 'walletobjects#image',
+                    'sourceUri': {
+                        'uri': 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
+                        'description': 'Space Pass Logo'
+                    }
+                },
                 'hexBackgroundColor': '#FFD700',
                 'hexForegroundColor': '#000000',
                 'reviewStatus': 'UNDER_REVIEW',

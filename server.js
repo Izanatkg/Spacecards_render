@@ -22,8 +22,8 @@ const LOYVERSE_TOKEN = '68c66646696548af983a2a0b8e64c2ec';
 const LOYVERSE_API_URL = 'https://api.loyverse.com/v1.0';
 const LOYVERSE_API_BASE = LOYVERSE_API_URL;
 const COUNTER_FILE = path.join(__dirname, 'customer_counter.txt');
-const WELCOME_POINTS = 10; // Puntos de bienvenida
-const POINTS_RATIO = 0.02; // Puntos por cada 100 de compra
+const WELCOME_POINTS = 100; // Puntos de bienvenida (100 = $1.00 en compra virtual)
+const POINTS_RATIO = 1; // 1 punto por cada $1 de compra (1%)
 const STORE_ID = 'b7e82499-21b0-4e9d-aae5-16d90693c77a';
 
 // Función para obtener y actualizar el contador de clientes
@@ -117,41 +117,35 @@ async function addPointsToCustomer(customerId, points) {
         }
         console.log(`Calculated points: ${finalPoints} (from original: ${points})`);
 
-        // Intentar primero con el endpoint de puntos directo
-        try {
-            console.log('Updating points directly...');
-            const currentPoints = currentCustomer.data.total_points || 0;
-            const newTotalPoints = currentPoints + finalPoints;
-            
-            const updateResponse = await loyverseApi.put(`/customers/${customerId}`, {
-                total_points: newTotalPoints
-            });
-            
-            console.log('Direct points update response:', updateResponse.data);
-            return updateResponse.data;
-        } catch (directError) {
-            console.error('Error in direct points update:', directError.response?.data || directError.message);
-            
-            // Si falla el método directo, intentar con merchandise_points
-            console.log('Trying merchandise points...');
-            const transactionResponse = await loyverseApi.post('/merchandise_points', {
-                customer_id: customerId,
-                points: finalPoints,
-                store_id: STORE_ID,
-                type: 'EARNING',
-                description: "Space Points"
-            });
-
-            console.log('Points transaction response:', transactionResponse.data);
-            
-            // Esperar un momento para que los puntos se actualicen
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Obtener el cliente actualizado para verificar los puntos
-            const customerResponse = await loyverseApi.get(`/customers/${customerId}`);
-            console.log('Updated customer data:', customerResponse.data);
-            return customerResponse.data;
-        }
+        // Actualizar puntos del cliente
+        const currentPoints = currentCustomer.data.total_points || 0;
+        const newTotalPoints = currentPoints + finalPoints;
+        
+        // Crear una compra virtual para asignar puntos
+        const receipt = {
+            store_id: STORE_ID,
+            customer_id: customerId,
+            total_money: finalPoints * 100, // Convertir puntos a dinero (1 punto = 1%)
+            receipt_type: "SALE",
+            payments: [
+                {
+                    type: "CASH",
+                    amount_money: finalPoints * 100
+                }
+            ]
+        };
+        
+        console.log('Creating virtual receipt for points:', receipt);
+        const receiptResponse = await loyverseApi.post('/receipts', receipt);
+        console.log('Receipt created:', receiptResponse.data);
+        
+        // Esperar un momento para que los puntos se actualicen
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Obtener el cliente actualizado para verificar los puntos
+        const customerResponse = await loyverseApi.get(`/customers/${customerId}`);
+        console.log('Updated customer data:', customerResponse.data);
+        return customerResponse.data;
     } catch (error) {
         console.error('Error adding points:', error.response?.data || error);
         throw error;

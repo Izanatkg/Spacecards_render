@@ -72,7 +72,6 @@ class GoogleWalletService {
             "id": this.CLASS_ID,
             "issuerName": "Space Pass",
             "programName": "Space Pass",
-            "programLogo": {},
             "reviewStatus": "REVIEW_STATUS_UNSPECIFIED",
             "version": "1",
             "hexBackgroundColor": "#FFD700",

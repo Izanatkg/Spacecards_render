@@ -208,11 +208,14 @@ app.post('/api/register', async (req, res) => {
             });
         }
 
+        // Formatear el número de teléfono (remover espacios y guiones)
+        const formattedPhone = phone.trim().replace(/[\s-]/g, '');
+        
         // Crear cliente en Loyverse
         const customerData = {
             name: name.trim(),
             email: email.trim(),
-            phone_number: phone.trim(),
+            phone_number: formattedPhone,
             loyalty_program_enabled: true
         };
 

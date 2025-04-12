@@ -220,8 +220,8 @@ app.post('/api/register', async (req, res) => {
             console.log('Respuesta de Loyverse:', loyverseCustomer);
 
             // Asignar puntos de bienvenida en Loyverse
-            console.log(`Asignando ${WELCOME_POINTS} puntos de bienvenida a ${loyverseCustomer.customer_code}`);
-            await addPointsToCustomer(loyverseCustomer.customer_code, WELCOME_POINTS);
+            console.log(`Asignando ${WELCOME_POINTS} puntos de bienvenida a ${loyverseCustomer.id}`);
+            await addPointsToCustomer(loyverseCustomer.id, WELCOME_POINTS);
             console.log('Puntos de bienvenida asignados correctamente');
 
         } catch (loyverseError) {

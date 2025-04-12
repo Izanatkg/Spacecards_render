@@ -39,23 +39,11 @@ const loyaltyClass = {
             value: "Space Cards"
         }
     },
-    programLogo: {
-        kind: "walletobjects#image",
-        sourceUri: {
-            uri: 'https://i.imgur.com/FpqHJGe.png',
-            description: "Space Cards Logo"
-        }
-    },
+
     reviewStatus: 'ACTIVE',
     hexBackgroundColor: '#D4AF37',
     hexForegroundColor: '#000000',
-    heroImage: {
-        kind: "walletobjects#image",
-        sourceUri: {
-            uri: 'https://i.imgur.com/space_logo.png',
-            description: "Space Pass Pokemon"
-        }
-    },
+
     locations: [
         {
             address: {

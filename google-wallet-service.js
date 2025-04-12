@@ -12,7 +12,7 @@ class GoogleWalletService {
         this.ISSUER_ID = process.env.ISSUER_ID || '3388000000022884108';
         this.ISSUER_NAME = process.env.ISSUER_NAME || 'Space Pass';
         this.PROGRAM_NAME = process.env.PROGRAM_NAME || 'Space Pass';
-        this.PROGRAM_LOGO = process.env.PROGRAM_LOGO || 'https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg';
+
 
         // Cargar credenciales
         try {
@@ -348,13 +348,7 @@ class GoogleWalletService {
                 hexBackgroundColor: "#1a1f2e",
                 hexFontColor: "#ffd700",
                 issuerName: this.ISSUER_NAME,
-                heroImage: {
-                    kind: "walletobjects#image",
-                    sourceUri: {
-                        uri: "https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg",
-                        description: "Space Pass Logo"
-                    }
-                },
+
                 textModulesData: [
                     {
                         header: "Space Points",
@@ -453,20 +447,7 @@ class GoogleWalletService {
                 'id': this.CLASS_ID,
                 'issuerName': this.ISSUER_NAME,
                 'programName': 'Space Pass',
-                'programLogo': {
-                    'kind': 'walletobjects#image',
-                    'sourceUri': {
-                        'uri': 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
-                        'description': 'Space Cards Logo'
-                    }
-                },
-                'heroImage': {
-                    'kind': 'walletobjects#image',
-                    'sourceUri': {
-                        'uri': 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
-                        'description': 'Space Cards Hero'
-                    }
-                },
+
                 'hexBackgroundColor': '#FFD700',
                 'hexForegroundColor': '#000000',
                 'reviewStatus': 'UNDER_REVIEW',

@@ -119,7 +119,7 @@ async function initializeCashPaymentType() {
     try {
         const paymentTypes = await getPaymentTypes();
         console.log('Available payment types:', paymentTypes);
-        const cashPaymentType = paymentTypes.find(type => type.name.toLowerCase() === 'cash');
+        const cashPaymentType = paymentTypes.find(type => type.type === 'CASH');
         if (cashPaymentType) {
             CASH_PAYMENT_TYPE_ID = cashPaymentType.id;
             console.log('Cash payment type ID initialized:', CASH_PAYMENT_TYPE_ID);
@@ -137,11 +137,6 @@ async function addPointsToCustomer(customerId, points) {
     try {
         console.log(`Adding points to customer ${customerId}`);
         
-        // Asegurarse de que tenemos el ID del tipo de pago en efectivo
-        if (!CASH_PAYMENT_TYPE_ID) {
-            await initializeCashPaymentType();
-        }
-        
         // Obtener los puntos actuales del cliente
         const currentCustomer = await loyverseApi.get(`/customers/${customerId}`);
         console.log('Current customer data:', currentCustomer.data);
@@ -158,26 +153,14 @@ async function addPointsToCustomer(customerId, points) {
         const currentPoints = currentCustomer.data.total_points || 0;
         const newTotalPoints = currentPoints + finalPoints;
         
-        // Crear una compra virtual para asignar puntos
-        const receipt = {
-            store_id: STORE_ID,
-            customer_id: customerId,
-            total_money: finalPoints * 100, // Convertir puntos a dinero (1 punto = 1%)
-            receipt_type: "SALE",
-            payments: [
-                {
-                    payment_type_id: CASH_PAYMENT_TYPE_ID,
-                    amount_money: finalPoints * 100
-                }
-            ]
+        // Actualizar los puntos del cliente directamente
+        const updateData = {
+            total_points: newTotalPoints
         };
         
-        console.log('Creating virtual receipt for points:', receipt);
-        const receiptResponse = await loyverseApi.post('/receipts', receipt);
-        console.log('Receipt created:', receiptResponse.data);
-        
-        // Esperar un momento para que los puntos se actualicen
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log('Updating customer points:', updateData);
+        const updateResponse = await loyverseApi.put(`/customers/${customerId}`, updateData);
+        console.log('Customer updated:', updateResponse.data);
         
         // Obtener el cliente actualizado para verificar los puntos
         const customerResponse = await loyverseApi.get(`/customers/${customerId}`);

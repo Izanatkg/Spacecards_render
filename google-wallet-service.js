@@ -76,11 +76,17 @@ class GoogleWalletService {
             "reviewStatus": "REVIEW_STATUS_UNSPECIFIED",
             "id": this.CLASS_ID,
             "version": "1",
-            "hexBackgroundColor": "#1a1f2e",
-            "hexFontColor": "#ffd700",
+            "hexBackgroundColor": "#FFD700",
+            "hexFontColor": "#000000",
             "multipleDevicesAndHoldersAllowedStatus": "STATUS_UNSPECIFIED",
             "enableSmartTap": true,
             "redemptionIssuers": [this.ISSUER_ID],
+            "imageModulesData": [],
+            "logo": {
+                "sourceUri": {
+                    "uri": "https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg"
+                }
+            },
             "infoModuleData": {
                 "labelValueRows": [
                     {
@@ -354,9 +360,15 @@ class GoogleWalletService {
                 id: `${this.ISSUER_ID}.${customerId}`,
                 classId: this.CLASS_ID,
                 state: "ACTIVE",
-                hexBackgroundColor: "#1a1f2e",
-                hexFontColor: "#ffd700",
+                hexBackgroundColor: "#FFD700",
+                hexFontColor: "#000000",
                 issuerName: this.ISSUER_NAME,
+                logo: {
+                    sourceUri: {
+                        uri: "https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_google_logo.jpg"
+                    }
+                },
+                imageModulesData: [],
 
                 textModulesData: [
                     {

@@ -70,19 +70,7 @@ class GoogleWalletService {
         this.CLIENT_ID = process.env.CLIENT_ID;
         this.loyaltyClass = {
             "issuerName": process.env.ISSUER_NAME,
-            "localizedIssuerName": {
-                "defaultValue": {
-                    "language": "es",
-                    "value": process.env.ISSUER_NAME
-                }
-            },
             "programName": "Space Pass",
-            "localizedProgramName": {
-                "defaultValue": {
-                    "language": "es",
-                    "value": "Space Pass"
-                }
-            },
 
             "rewardsTier": "REWARDS_TIER_UNSPECIFIED",
             "reviewStatus": "REVIEW_STATUS_UNSPECIFIED",
@@ -97,19 +85,7 @@ class GoogleWalletService {
                         "columns": [
                             {
                                 "label": "Monedero Electrónico Space Pass",
-                                "localizedLabel": {
-                                    "defaultValue": {
-                                        "language": "es",
-                                        "value": "Monedero Electrónico Space Pass"
-                                    }
-                                },
-                                "value": "Acumula y Disfruta",
-                                "localizedValue": {
-                                    "defaultValue": {
-                                        "language": "es",
-                                        "value": "Acumula y Disfruta"
-                                    }
-                                }
+                                "value": "Acumula y Disfruta"
                             }
                         ]
                     }
@@ -118,19 +94,7 @@ class GoogleWalletService {
             "textModulesData": [
                 {
                     "header": "Space Points",
-                    "localizedHeader": {
-                        "defaultValue": {
-                            "language": "es",
-                            "value": "Space Points"
-                        }
-                    },
-                    "body": "0",
-                    "localizedBody": {
-                        "defaultValue": {
-                            "language": "es",
-                            "value": "0"
-                        }
-                    }
+                    "body": "0"
                 }
             ],
             "linksModuleData": {
@@ -230,62 +194,27 @@ class GoogleWalletService {
                 state: 'ACTIVE',
                 accountId: id,
                 accountName: name,
-                localizedAccountName: {
-                    defaultValue: {
-                        language: 'es',
-                        value: name
-                    }
-                },
                 issuerName: this.ISSUER_NAME,
                 loyaltyPoints: {
                     balance: {
-                        int: Math.floor(points),
-                        localizedString: {
-                            defaultValue: {
-                                language: 'es',
-                                value: Math.floor(points).toString()
-                            }
-                        }
+                        string: points.toString()
                     },
-                    label: 'Space Points',
-                    localizedLabel: {
-                        defaultValue: {
-                            language: 'es',
-                            value: 'Space Points'
-                        }
-                    }
+                    label: 'Space Points'
                 },
                 barcode: {
                     type: 'QR_CODE',
                     value: id,
                     alternateText: id,
-                    localizedAlternateText: {
-                        defaultValue: {
-                            language: 'es',
-                            value: id
-                        }
-                    },
                     showCodeText: { type: 'TEXT' },
-                    alignment: 'CENTER'
+                    alignment: 'CENTER',
+                    renderEncoded: true
                 },
                 hexBackgroundColor: '#1a1f2e',
                 hexFontColor: '#ffd700',
                 textModulesData: [
                     {
                         header: 'Space Points',
-                        localizedHeader: {
-                            defaultValue: {
-                                language: 'es',
-                                value: 'Space Points'
-                            }
-                        },
-                        body: points.toString(),
-                        localizedBody: {
-                            defaultValue: {
-                                language: 'es',
-                                value: points.toString()
-                            }
-                        }
+                        body: points.toString()
                     }
                 ],
                 infoModuleData: {
@@ -294,19 +223,7 @@ class GoogleWalletService {
                             columns: [
                                 {
                                     label: 'Monedero Electrónico Space Pass',
-                                    localizedLabel: {
-                                        defaultValue: {
-                                            language: 'es',
-                                            value: 'Monedero Electrónico Space Pass'
-                                        }
-                                    },
-                                    value: 'Acumula y Disfruta',
-                                    localizedValue: {
-                                        defaultValue: {
-                                            language: 'es',
-                                            value: 'Acumula y Disfruta'
-                                        }
-                                    }
+                                    value: 'Acumula y Disfruta'
                                 }
                             ]
                         }
@@ -381,13 +298,7 @@ class GoogleWalletService {
                     requestBody: {
                         loyaltyPoints: {
                             balance: {
-                                int: Math.floor(points),
-                                localizedString: {
-                                    defaultValue: {
-                                        language: 'es',
-                                        value: Math.floor(points).toString()
-                                    }
-                                }
+                                int: Math.floor(points)
                             }
                         }
                     }
@@ -437,41 +348,17 @@ class GoogleWalletService {
                 hexBackgroundColor: "#1a1f2e",
                 hexFontColor: "#ffd700",
                 issuerName: this.ISSUER_NAME,
-                localizedIssuerName: {
-                    defaultValue: {
-                        language: 'es',
-                        value: this.ISSUER_NAME
+                heroImage: {
+                    kind: "walletobjects#image",
+                    sourceUri: {
+                        uri: "https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg",
+                        description: "Space Pass Logo"
                     }
-                },
-                barcode: {
-                    type: 'QR_CODE',
-                    value: customerId,
-                    alternateText: customerId,
-                    localizedAlternateText: {
-                        defaultValue: {
-                            language: 'es',
-                            value: customerId
-                        }
-                    },
-                    showCodeText: { type: 'TEXT' },
-                    alignment: 'CENTER'
                 },
                 textModulesData: [
                     {
                         header: "Space Points",
-                        localizedHeader: {
-                            defaultValue: {
-                                language: "es",
-                                value: "Space Points"
-                            }
-                        },
-                        body: points.toString(),
-                        localizedBody: {
-                            defaultValue: {
-                                language: "es",
-                                value: points.toString()
-                            }
-                        }
+                        body: points.toString()
                     }
                 ],
                 linksModuleData: {
@@ -494,19 +381,7 @@ class GoogleWalletService {
                             columns: [
                                 {
                                     label: "Monedero Electrónico Space Pass",
-                                    localizedLabel: {
-                                        defaultValue: {
-                                            language: "es",
-                                            value: "Monedero Electrónico Space Pass"
-                                        }
-                                    },
-                                    value: "Acumula y Disfruta",
-                                    localizedValue: {
-                                        defaultValue: {
-                                            language: "es",
-                                            value: "Acumula y Disfruta"
-                                        }
-                                    }
+                                    value: "Acumula y Disfruta"
                                 }
                             ]
                         }

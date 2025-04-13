@@ -310,24 +310,40 @@ class GoogleWalletService {
                     resourceId: objectId
                 });
 
-                // Actualizar puntos
-                await this.client.loyaltyobject.patch({
-                    resourceId: objectId,
-                    requestBody: {
-                        loyaltyPoints: {
-                            balance: {
-                                string: points.toString()
-                            },
-                            label: 'Space Points'
-                        },
-                        textModulesData: [
-                            {
-                                header: 'Space Points',
-                                body: points.toString()
-                            }
-                        ]
-                    }
+                console.log('Actualizando objeto de lealtad con ID:', objectId);
+                // Obtener el objeto actual primero
+                const currentObject = await this.client.loyaltyobject.get({
+                    resourceId: objectId
                 });
+                
+                console.log('Objeto actual:', currentObject.data);
+                
+                // Preparar el objeto de actualización
+                const updateObject = {
+                    ...currentObject.data,
+                    loyaltyPoints: {
+                        balance: {
+                            string: points.toString()
+                        },
+                        label: 'Space Points'
+                    },
+                    textModulesData: [
+                        {
+                            header: 'Space Points',
+                            body: points.toString()
+                        }
+                    ]
+                };
+                
+                console.log('Objeto de actualización:', updateObject);
+                
+                // Actualizar el objeto completo
+                await this.client.loyaltyobject.update({
+                    resourceId: objectId,
+                    requestBody: updateObject
+                });
+                
+                console.log('Objeto actualizado correctamente');
 
                 return true;
             } catch (error) {

@@ -222,6 +222,16 @@ app.post('/api/register', async (req, res) => {
             throw new Error('Error al crear cliente en Loyverse: respuesta inválida');
         }
 
+        // Añadir puntos de bienvenida en Loyverse
+        try {
+            console.log(`Añadiendo ${WELCOME_POINTS} puntos de bienvenida a`, loyverseCustomer.id);
+            await addPointsToCustomer(loyverseCustomer.id, WELCOME_POINTS);
+            console.log('Puntos de bienvenida añadidos exitosamente');
+        } catch (pointsError) {
+            console.error('Error al añadir puntos de bienvenida:', pointsError);
+            throw new Error(`Error al añadir puntos de bienvenida: ${pointsError.message}`);
+        }
+
         // Crear objeto de Google Wallet - Ahora es obligatorio
         let walletUrl;
         try {

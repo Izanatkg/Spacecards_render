@@ -204,12 +204,23 @@ class GoogleWalletService {
                     type: 'QR_CODE',
                     value: id,
                     alternateText: id,
-                    showCodeText: { type: 'TEXT' },
+                    showCodeText: { 
+                        defaultValue: {
+                            language: 'es',
+                            value: id
+                        }
+                    },
                     alignment: 'CENTER',
                     renderEncoded: true,
                     valueDisplayed: true
                 },
                 cardTitle: {
+                    defaultValue: {
+                        language: 'es',
+                        value: 'Space Pass'
+                    }
+                },
+                header: {
                     defaultValue: {
                         language: 'es',
                         value: 'Space Pass'
@@ -233,7 +244,8 @@ class GoogleWalletService {
                                 }
                             ]
                         }
-                    ]
+                    ],
+                    showLastUpdateTime: true
                 }
             };
 
@@ -324,9 +336,15 @@ class GoogleWalletService {
                     // Si el objeto no existe, crearlo
                     await this.createLoyaltyObject({ 
                         id: userId, 
-                        name: 'Unknown', 
+                        name: 'Cliente Space Pass', 
                         email: `user-${userId}@pokepuntos.com`, 
-                        points 
+                        points,
+                        cardTitle: {
+                            defaultValue: {
+                                language: 'es',
+                                value: 'Space Pass'
+                            }
+                        }
                     });
                     return true;
                 }

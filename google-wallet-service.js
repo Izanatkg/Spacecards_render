@@ -304,9 +304,16 @@ class GoogleWalletService {
                     requestBody: {
                         loyaltyPoints: {
                             balance: {
-                                int: Math.floor(points)
+                                string: points.toString()
+                            },
+                            label: 'Space Points'
+                        },
+                        textModulesData: [
+                            {
+                                header: 'Space Points',
+                                body: points.toString()
                             }
-                        }
+                        ]
                     }
                 });
 

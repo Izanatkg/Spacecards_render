@@ -164,14 +164,15 @@ const Register = () => {
                         overflow: 'hidden',
                         bgcolor: '#1a1f2e',
                         color: 'white',
-                        display: 'flex'
+                        display: 'flex',
+                        flexDirection: { xs: 'column', md: 'row' }
                     }}
                 >
                     {/* Lado izquierdo - Monedero */}
                     <Box sx={{ 
-                        p: 4, 
+                        p: { xs: 2, md: 4 },
                         bgcolor: '#141821',
-                        width: '40%',
+                        width: { xs: '100%', md: '40%' },
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
@@ -179,8 +180,8 @@ const Register = () => {
                     }}>
                         <Box 
                             sx={{ 
-                                width: 200,
-                                height: 200,
+                                width: { xs: 150, sm: 200 },
+                                height: { xs: 150, sm: 200 },
                                 mb: 2,
                                 display: 'flex',
                                 alignItems: 'center',
@@ -190,11 +191,13 @@ const Register = () => {
                         >
                             <QRCodeSVG 
                                 value={customerCode} 
-                                size={200}
+                                size={window.innerWidth < 600 ? 150 : 200}
                                 style={{
                                     background: '#1a1f2e',
                                     padding: '10px',
                                     borderRadius: '10px',
+                                    maxWidth: '100%',
+                                    height: 'auto'
                                 }}
                             />
                         </Box>
@@ -211,11 +214,12 @@ const Register = () => {
                     </Box>
 
                     {/* Lado derecho - Información */}
-                    <Box sx={{ p: 4, width: '60%' }}>
+                    <Box sx={{ p: { xs: 2, md: 4 }, width: { xs: '100%', md: '60%' } }}>
                         <Typography 
                             variant="h4" 
                             sx={{ 
                                 mb: 2,
+                                fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' },
                                 background: 'linear-gradient(45deg, #9c27b0, #7986cb)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent'
@@ -252,7 +256,12 @@ const Register = () => {
                         >
                             Puntos actuales: <span style={{color: '#fff'}}>{points || 0}</span>
                         </Typography>
-                        <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
+                        <Box sx={{ 
+                            mt: 4, 
+                            display: 'flex', 
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            gap: 2
+                        }}>
                             {walletUrl && (
                                 <Button
                                     variant="contained"
@@ -302,14 +311,15 @@ const Register = () => {
                     overflow: 'hidden',
                     bgcolor: '#1a1f2e',
                     color: 'white',
-                    display: 'flex'
+                    display: 'flex',
+                    flexDirection: { xs: 'column', md: 'row' }
                 }}
             >
                 {/* Lado izquierdo - Logo */}
                 <Box sx={{ 
-                    p: 4, 
+                    p: { xs: 2, md: 4 }, 
                     bgcolor: '#141821',
-                    width: '40%',
+                    width: { xs: '100%', md: '40%' },
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
@@ -351,11 +361,12 @@ const Register = () => {
                 </Box>
 
                 {/* Lado derecho - Formulario */}
-                <Box sx={{ p: 4, width: '60%' }}>
+                <Box sx={{ p: { xs: 2, md: 4 }, width: { xs: '100%', md: '60%' } }}>
                     <Typography 
                         variant="h4" 
                         sx={{ 
                             mb: 1,
+                            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' },
                             background: 'linear-gradient(45deg, #9c27b0, #7986cb)',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent'

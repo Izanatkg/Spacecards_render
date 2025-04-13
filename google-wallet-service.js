@@ -69,64 +69,52 @@ class GoogleWalletService {
         this.baseUrl = 'https://walletobjects.googleapis.com/walletobjects/v1';
         this.CLIENT_ID = process.env.CLIENT_ID;
         this.loyaltyClass = {
-            'id': this.CLASS_ID,
-            'issuerName': this.ISSUER_NAME,
-            'programName': this.PROGRAM_NAME,
-            'programLogo': {
-                'kind': 'walletobjects#image',
-                'sourceUri': {
-                    'uri': 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
-                    'description': 'Space Pass Logo'
+            "id": this.CLASS_ID,
+            "issuerName": "Mamitas Tepic",
+            "programName": "Pokemon Loyalty Program",
+            "programLogo": {
+                "sourceUri": {
+                    "uri": "https://i.imgur.com/EoHhHnU.jpg",
+                    "description": "Logo de Mamitas Tepic"
+                },
+                "contentDescription": {
+                    "defaultValue": {
+                        "language": "es",
+                        "value": "Logo de Mamitas Tepic"
+                    }
                 }
             },
-            'hexBackgroundColor': '#1a1f2e',
-            'hexForegroundColor': '#ffd700',
-            'reviewStatus': 'UNDER_REVIEW',
-            'allowMultipleUsersPerObject': true,
-            'locations': [],
-            'messages': [
+            "reviewStatus": "REVIEW_STATUS_UNSPECIFIED",
+            "version": "1",
+            "hexBackgroundColor": "#FFD700",
+            "hexFontColor": "#000000",
+            "multipleDevicesAndHoldersAllowedStatus": "STATUS_UNSPECIFIED",
+            "messages": [
                 {
-                    'header': 'Bienvenido a Space Pass',
-                    'body': 'Escanea este código para acumular puntos'
+                    "header": "Bienvenido a Space Pass",
+                    "body": "Escanea este código para acumular puntos"
                 }
             ],
-            'infoModuleData': {
-                'labelValueRows': [
-                    {
-                        'columns': [
-                            {
-                                'label': 'Programa',
-                                'value': 'Space Pass'
-                            }
-                        ]
-                    }
-                ]
-            },
-            'textModulesData': [
+            "locations": [],
+            "accountIdLabel": "ID de Cliente",
+            "accountNameLabel": "Nombre",
+            "rewardsTier": "REWARDS_TIER_UNSPECIFIED",
+            "secondaryLoyaltyPoints": [],
+            "textModulesData": [
                 {
-                    'header': 'Space Points',
-                    'body': '0'
+                    "header": "Space Points",
+                    "body": "0"
                 }
             ],
-            'linksModuleData': {
-                'uris': [
+            "linksModuleData": {
+                "uris": [
                     {
-                        'uri': 'https://spacecards-loyalty.onrender.com',
-                        'description': 'Visitar Space Cards Store'
+                        "uri": "https://space-pass-nq9e0cv.gamma.site",
+                        "description": "Visitar Space Pass",
+                        "id": "website"
                     }
                 ]
-            },
-            'imageModulesData': [
-                {
-                    'mainImage': {
-                        'kind': 'walletobjects#image',
-                        'sourceUri': {
-                            'uri': 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
-                            'description': 'Space Cards Background'
-                        }
-                    }
-                }
-            ]
+            }
         };
         console.log('Google Wallet service initialized');
     }
@@ -144,36 +132,55 @@ class GoogleWalletService {
 
     async createLoyaltyClass() {
         try {
-            console.log('Creating/updating loyalty class...');
+            console.log('Creating new loyalty class...');
+            const token = await this.getAuthToken();
             
-            // Intentar obtener la clase existente
+            // Forzar eliminación de la clase existente
             try {
-                console.log('Checking if loyalty class exists:', this.CLASS_ID);
-                await this.client.loyaltyclass.get({
-                    resourceId: this.CLASS_ID
+                const deleteUrl = `${this.baseUrl}/loyaltyClass/${this.CLASS_ID}`;
+                console.log('Attempting to delete existing class:', deleteUrl);
+                await axios.delete(deleteUrl, {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
-                
-                // Si existe, actualizarla
-                console.log('Loyalty class exists, updating...');
-                const updateResponse = await this.client.loyaltyclass.update({
-                    resourceId: this.CLASS_ID,
-                    requestBody: this.loyaltyClass
-                });
-                console.log('Loyalty class updated successfully');
-                return updateResponse.data;
-            } catch (error) {
-                if (error.response?.status === 404) {
-                    // Si no existe, crear una nueva
-                    console.log('Loyalty class does not exist, creating new one...');
-                    const createResponse = await this.client.loyaltyclass.insert({
-                        requestBody: this.loyaltyClass
-                    });
-                    console.log('Loyalty class created successfully');
-                    return createResponse.data;
-                } else {
-                    throw error;
-                }
+                console.log('Successfully deleted existing loyalty class');
+            } catch (deleteError) {
+                console.log('No existing class to delete or error:', deleteError.message);
             }
+            
+            // Intentar eliminar la clase existente primero
+            try {
+                await axios.delete(
+                    `${this.baseUrl}/loyaltyClass/${this.CLASS_ID}`,
+                    {
+                        headers: { 
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }
+                );
+                console.log('Existing loyalty class deleted successfully');
+            } catch (error) {
+                // Ignorar errores si la clase no existe
+                console.log('No existing loyalty class to delete or error:', error.message);
+            }
+            
+            // Crear una nueva clase
+            console.log('Creating new loyalty class...');
+
+            // Crear la clase de lealtad
+            const response = await axios.post(
+                `${this.baseUrl}/loyaltyClass`,
+                this.loyaltyClass,
+                {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            console.log('Loyalty class created successfully');
+            return response.data;
         } catch (error) {
             console.error('Error creating loyalty class:', error.response?.data || error.message);
             throw error;
@@ -208,22 +215,15 @@ class GoogleWalletService {
                     type: 'QR_CODE',
                     value: id,
                     alternateText: id,
-                    showCodeText: { 
-                        kind: 'walletobjects#localizedString',
-                        defaultValue: {
-                            language: 'es',
-                            value: 'Código de Cliente'
-                        }
-                    },
+                    showCodeText: { type: 'TEXT' },
                     alignment: 'CENTER',
                     renderEncoded: true,
                     valueDisplayed: true
                 },
                 cardTitle: {
-                    kind: 'walletobjects#localizedString',
                     defaultValue: {
                         language: 'es',
-                        value: 'Space Pass Loyalty Card'
+                        value: 'Space Pass'
                     }
                 },
                 hexBackgroundColor: '#1a1f2e',
@@ -472,13 +472,7 @@ class GoogleWalletService {
                 'id': this.CLASS_ID,
                 'issuerName': this.ISSUER_NAME,
                 'programName': 'Space Pass',
-                'programLogo': {
-                    'kind': 'walletobjects#image',
-                    'sourceUri': {
-                        'uri': 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
-                        'description': 'Space Pass Logo'
-                    }
-                },
+
                 'hexBackgroundColor': '#FFD700',
                 'hexForegroundColor': '#000000',
                 'reviewStatus': 'UNDER_REVIEW',

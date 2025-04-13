@@ -101,21 +101,29 @@ loyverseApi.get('/stores')
     });
 
 // Función para añadir puntos a un cliente en Loyverse
-async function addPointsToCustomer(customerId, points) {
+async function addPointsToCustomer(customerCode, points) {
     try {
-        console.log(`Adding points to customer ${customerId}`);
+        console.log(`Adding points to customer ${customerCode}`);
         
-        // Primero obtener los puntos actuales del cliente
-        const customerResponse = await loyverseApi.get(`/customers/${customerId}`);
-        const currentPoints = customerResponse.data.total_points || 0;
+        // Primero obtener el cliente por su código
+        const customersResponse = await loyverseApi.get('/customers', {
+            params: { customer_code: customerCode }
+        });
+        
+        if (!customersResponse.data.customers || customersResponse.data.customers.length === 0) {
+            throw new Error('Cliente no encontrado');
+        }
+        
+        const customer = customersResponse.data.customers[0];
+        const currentPoints = customer.total_points || 0;
         const newPoints = currentPoints + points;
         
         console.log('Current points:', currentPoints);
         console.log('Adding points:', points);
         console.log('New total:', newPoints);
 
-        // Actualizar los puntos del cliente
-        const updateResponse = await loyverseApi.put(`/customers/${customerId}`, {
+        // Actualizar los puntos del cliente usando su ID
+        const updateResponse = await loyverseApi.put(`/customers/${customer.id}`, {
             total_points: newPoints
         });
         
@@ -182,7 +190,8 @@ app.post('/api/register', async (req, res) => {
             name: name.trim(),
             email: email.trim(),
             phone_number: phone.trim(),
-            loyalty_program_enabled: true
+            loyalty_program_enabled: true,
+            total_points: WELCOME_POINTS // Establecer los puntos directamente al crear el cliente
         };
 
         console.log('Enviando datos a Loyverse:', customerData);
@@ -199,15 +208,12 @@ app.post('/api/register', async (req, res) => {
             throw new Error('Error al crear cliente en Loyverse: respuesta inválida');
         }
 
-        // Añadir puntos de bienvenida en Loyverse
-        try {
-            console.log(`Añadiendo ${WELCOME_POINTS} puntos de bienvenida a`, loyverseCustomer.id);
-            await addPointsToCustomer(loyverseCustomer.id, WELCOME_POINTS);
-            console.log('Puntos de bienvenida añadidos exitosamente');
-        } catch (pointsError) {
-            console.error('Error al añadir puntos de bienvenida:', pointsError);
-            throw new Error(`Error al añadir puntos de bienvenida: ${pointsError.message}`);
+        // Verificar que los puntos se establecieron correctamente
+        if (!loyverseCustomer.total_points || loyverseCustomer.total_points < WELCOME_POINTS) {
+            console.error('Los puntos de bienvenida no se establecieron correctamente');
+            throw new Error('Error al establecer los puntos de bienvenida');
         }
+        console.log('Puntos de bienvenida establecidos exitosamente:', loyverseCustomer.total_points);
 
         // Crear objeto de Google Wallet - Ahora es obligatorio
         let walletUrl;

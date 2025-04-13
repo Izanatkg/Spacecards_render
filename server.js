@@ -105,48 +105,25 @@ async function addPointsToCustomer(customerId, points) {
     try {
         console.log(`Adding points to customer ${customerId}`);
         
-        // Calcular puntos basado en la compra (si es una compra)
-        let finalPoints = points;
-        if (points > 0 && points !== WELCOME_POINTS) {
-            // Si no son puntos de bienvenida, calcular basado en el ratio
-            finalPoints = Math.floor((points / 100) * POINTS_RATIO * 100) / 100;
-        }
-        console.log(`Calculated points: ${finalPoints} (from original: ${points})`);
-
-        // Crear una transacción de puntos usando el endpoint de mercancías
-        const transactionResponse = await loyverseApi.post('/merchandise_points', {
-            customer_id: customerId,
-            points: finalPoints,
-            store_id: STORE_ID,
-            type: 'EARNING',
-            description: "Space Points"
-        });
-
-        console.log('Points transaction response:', transactionResponse.data);
-        
-        // Esperar un momento para que los puntos se actualicen
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Obtener el cliente actualizado para verificar los puntos
+        // Primero obtener los puntos actuales del cliente
         const customerResponse = await loyverseApi.get(`/customers/${customerId}`);
-        console.log('Updated customer data:', customerResponse.data);
-        return customerResponse.data;
+        const currentPoints = customerResponse.data.total_points || 0;
+        const newPoints = currentPoints + points;
+        
+        console.log('Current points:', currentPoints);
+        console.log('Adding points:', points);
+        console.log('New total:', newPoints);
+
+        // Actualizar los puntos del cliente
+        const updateResponse = await loyverseApi.put(`/customers/${customerId}`, {
+            total_points: newPoints
+        });
+        
+        console.log('Points update response:', updateResponse.data);
+        return updateResponse.data;
     } catch (error) {
         console.error('Error adding points:', error.response?.data || error);
-        
-        // Si falla, intentar con el endpoint de puntos directo
-        try {
-            console.log('Trying direct points update...');
-            const updateResponse = await loyverseApi.put(`/customers/${customerId}`, {
-                total_points: points
-            });
-            
-            console.log('Direct points update response:', updateResponse.data);
-            return updateResponse.data;
-        } catch (updateError) {
-            console.error('Error in direct points update:', updateError.response?.data || updateError.message);
-            throw updateError;
-        }
+        throw error;
     }
 }
 

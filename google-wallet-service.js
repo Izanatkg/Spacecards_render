@@ -194,12 +194,6 @@ class GoogleWalletService {
                 accountId: id,
                 accountName: name,
                 issuerName: this.ISSUER_NAME,
-                loyaltyPoints: {
-                    balance: {
-                        string: points.toString()
-                    },
-                    label: 'Puntos'
-                },
                 barcode: {
                     type: 'QR_CODE',
                     value: id,
@@ -228,10 +222,16 @@ class GoogleWalletService {
                 },
                 hexBackgroundColor: '#1a1f2e',
                 hexFontColor: '#ffd700',
+                loyaltyPoints: {
+                    balance: {
+                        string: points.toString()
+                    },
+                    label: 'Space Points'
+                },
                 textModulesData: [
                     {
                         id: 'points',
-                        header: 'Puntos',
+                        header: 'Space Points',
                         body: points.toString()
                     }
                 ],
@@ -311,18 +311,10 @@ class GoogleWalletService {
                     resourceId: objectId
                 });
 
-                console.log('Actualizando objeto de lealtad con ID:', objectId);
-                // Obtener el objeto actual primero
-                const currentObject = await this.client.loyaltyobject.get({
-                    resourceId: objectId
-                });
+                console.log('Actualizando puntos en Google Wallet...');
                 
-                console.log('Objeto actual:', currentObject.data);
-                
-                // Mantener la estructura existente y actualizar solo los puntos
+                // Solo actualizar los campos de puntos
                 const updateObject = {
-                    ...currentObject.data,
-                    state: 'ACTIVE',
                     loyaltyPoints: {
                         balance: {
                             string: points.toString()
@@ -331,37 +323,20 @@ class GoogleWalletService {
                     },
                     textModulesData: [
                         {
-                            id: 'points_balance',
+                            id: 'points',
                             header: 'Space Points',
                             body: points.toString()
                         }
                     ]
                 };
-
-                // Asegurarnos que los campos requeridos estén presentes
-                if (!updateObject.cardTitle) {
-                    updateObject.cardTitle = {
-                        defaultValue: {
-                            language: 'es',
-                            value: 'Space Pass'
-                        }
-                    };
-                }
-
-                if (!updateObject.header) {
-                    updateObject.header = {
-                        defaultValue: {
-                            language: 'es',
-                            value: 'Space Pass'
-                        }
-                    };
-                }
+                
+                console.log('Datos de actualización:', JSON.stringify(updateObject, null, 2));
                 
                 console.log('Objeto de actualización:', updateObject);
                 
-                console.log('Enviando actualización a Google Wallet...');
+                console.log('Enviando actualización a Google Wallet...', JSON.stringify(updateObject, null, 2));
                 
-                // Actualizar el objeto completo usando patch en lugar de update
+                // Actualizar solo los campos necesarios
                 const result = await this.client.loyaltyobject.patch({
                     resourceId: objectId,
                     requestBody: updateObject

@@ -197,16 +197,7 @@ class GoogleWalletService {
                 barcode: {
                     type: 'QR_CODE',
                     value: id,
-                    alternateText: id,
-                    showCodeText: { 
-                        defaultValue: {
-                            language: 'es',
-                            value: id
-                        }
-                    },
-                    alignment: 'CENTER',
-                    renderEncoded: true,
-                    valueDisplayed: true
+                    alternateText: id
                 },
                 cardTitle: {
                     defaultValue: {
@@ -224,7 +215,7 @@ class GoogleWalletService {
                 hexFontColor: '#ffd700',
                 loyaltyPoints: {
                     balance: {
-                        string: points.toString()
+                        int: parseInt(points)
                     },
                     label: 'Space Points'
                 },
@@ -235,19 +226,12 @@ class GoogleWalletService {
                         body: points.toString()
                     }
                 ],
-                infoModuleData: {
-                    labelValueRows: [
-                        {
-                            columns: [
-                                {
-                                    label: 'Monedero Electrónico Space Pass',
-                                    value: 'Acumula y Disfruta'
-                                }
-                            ]
-                        }
-                    ],
-                    showLastUpdateTime: true
-                }
+                messages: [
+                    {
+                        header: 'Space Pass',
+                        body: 'Gracias por tu lealtad'
+                    }
+                ]
             };
 
             // Verificar si el objeto ya existe
@@ -313,11 +297,12 @@ class GoogleWalletService {
 
                 console.log('Actualizando puntos en Google Wallet...');
                 
-                // Solo actualizar los campos de puntos
+                // Actualizar campos necesarios manteniendo el estado activo
                 const updateObject = {
+                    state: 'ACTIVE',
                     loyaltyPoints: {
                         balance: {
-                            string: points.toString()
+                            int: parseInt(points)
                         },
                         label: 'Space Points'
                     },
@@ -332,17 +317,13 @@ class GoogleWalletService {
                 
                 console.log('Datos de actualización:', JSON.stringify(updateObject, null, 2));
                 
-                console.log('Objeto de actualización:', updateObject);
-                
-                console.log('Enviando actualización a Google Wallet...', JSON.stringify(updateObject, null, 2));
-                
-                // Actualizar solo los campos necesarios
+                // Usar patch para actualizar los campos
                 const result = await this.client.loyaltyobject.patch({
                     resourceId: objectId,
                     requestBody: updateObject
                 });
                 
-                console.log('Objeto actualizado correctamente:', JSON.stringify(result.data, null, 2));
+                console.log('Puntos actualizados correctamente');
 
                 return true;
             } catch (error) {
@@ -373,121 +354,39 @@ class GoogleWalletService {
 
     async createPass(customerId, customerName, points) {
         try {
-            console.log('Iniciando creación de pase para:', {
-                customerId,
-                customerName,
-                points,
-                classId: this.CLASS_ID,
-                issuerId: this.ISSUER_ID
+            console.log('Creando pase para:', { customerId, customerName, points });
+            
+            // Crear el objeto de lealtad
+            await this.createLoyaltyObject({
+                id: customerId,
+                name: customerName,
+                email: `${customerId}@pokepuntos.com`,
+                points: points
             });
 
-            // Verificar que tenemos todas las variables de entorno necesarias
-            if (!this.CLASS_ID || !this.ISSUER_ID || !this.ISSUER_NAME || !this.PROGRAM_NAME) {
-                throw new Error('Faltan variables de entorno requeridas para Google Wallet');
-            }
-
-            // Crear el objeto de lealtad
-            const loyaltyObject = {
-                id: `${this.ISSUER_ID}.${customerId}`,
-                classId: this.CLASS_ID,
-                state: "ACTIVE",
-                barcode: {
-                    type: "QR_CODE",
-                    value: customerId,
-                    alternateText: customerId,
-                    renderEncoded: true
-                },
-                hexBackgroundColor: "#FFD700",
-                hexFontColor: "#000000",
-                issuerName: this.ISSUER_NAME,
-                accountId: customerId,
-                accountName: customerName,
-                points: {
-                    balance: {
-                        int: points
-                    },
-                    label: "Space Points"
-                },
-                textModulesData: [
-                    {
-                        header: "Space Points",
-                        body: points.toString()
-                    }
-                ],
-                linksModuleData: {
-                    uris: [
-                        {
-                            uri: "https://space-pass-nq9e0cv.gamma.site",
-                            description: "Visitar Space Pass",
-                            id: "website"
-                        }
-                    ]
-                },
-                infoModuleData: {
-                    labelValueRows: [
-                        {
-                            columns: [
-                                {
-                                    label: "Monedero Electrónico Space Pass",
-                                    value: "Acumula y Disfruta"
-                                }
-                            ]
-                        }
-                    ]
-                },
-                accountId: customerId,
-                accountName: customerName,
-                loyaltyPoints: {
-                    label: "Space Points",
-                    balance: {
-                        string: points.toString()
-                    }
-                },
-                localizedAccountName: {
-                    kind: "walletobjects#localizedString",
-                    defaultValue: {
-                        language: "es",
-                        value: customerName
-                    }
+            // Generar el link de Google Wallet
+            const claims = {
+                iss: this.credentials.client_email,
+                aud: 'google',
+                origins: ['https://spacecards-loyalty.onrender.com'],
+                typ: 'savetowallet',
+                payload: {
+                    loyaltyObjects: [{
+                        id: `${this.CLASS_ID}.${customerId}`,
+                        classId: this.CLASS_ID
+                    }]
                 }
             };
 
-            console.log('Objeto de lealtad creado:', loyaltyObject);
+            console.log('Generando JWT con claims:', claims);
 
-            try {
-                // Intentar crear el objeto de lealtad
-                const response = await this.client.loyaltyobject.insert({
-                    requestBody: loyaltyObject
-                });
-                console.log('Objeto de lealtad creado exitosamente:', response.data);
+            const token = jwt.sign(claims, this.credentials.private_key, {
+                algorithm: 'RS256'
+            });
 
-                // Generar el link de Google Wallet
-                const claims = {
-                    iss: this.credentials.client_email,
-                    aud: 'google',
-                    origins: ['https://spacecards-loyalty.onrender.com'],
-                    typ: 'savetowallet',
-                    payload: {
-                        loyaltyObjects: [{
-                            id: `${this.ISSUER_ID}.${customerId}`,
-                            classId: this.CLASS_ID
-                        }]
-                    }
-                };
+            console.log('JWT generado exitosamente');
+            return `https://pay.google.com/gp/v/save/${token}`;
 
-                console.log('Generando JWT con claims:', claims);
-
-                const token = jwt.sign(claims, this.credentials.private_key, {
-                    algorithm: 'RS256'
-                });
-
-                console.log('JWT generado exitosamente');
-
-                return `https://pay.google.com/gp/v/save/${token}`;
-            } catch (apiError) {
-                console.error('Error al crear objeto de lealtad en Google Wallet:', apiError.response?.data || apiError);
-                throw new Error(`Error al crear tarjeta de lealtad: ${apiError.message}`);
-            }
         } catch (error) {
             console.error('Error detallado en createPass:', error);
             throw error;

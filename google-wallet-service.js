@@ -319,9 +319,36 @@ class GoogleWalletService {
                 
                 console.log('Objeto actual:', currentObject.data);
                 
-                // Preparar el objeto de actualización
+                // Preparar el objeto de actualización con la estructura completa
                 const updateObject = {
-                    ...currentObject.data,
+                    id: objectId,
+                    classId: this.CLASS_ID,
+                    state: 'ACTIVE',
+                    accountId: currentObject.data.accountId,
+                    accountName: currentObject.data.accountName,
+                    issuerName: this.ISSUER_NAME,
+                    barcode: currentObject.data.barcode,
+                    hexBackgroundColor: '#1a1f2e',
+                    hexFontColor: '#ffd700',
+                    logo: currentObject.data.logo,
+                    cardTitle: {
+                        defaultValue: {
+                            language: 'es',
+                            value: 'Space Pass'
+                        }
+                    },
+                    header: {
+                        defaultValue: {
+                            language: 'es',
+                            value: 'Space Pass'
+                        }
+                    },
+                    subheader: {
+                        defaultValue: {
+                            language: 'es',
+                            value: 'Puntos: ' + points.toString()
+                        }
+                    },
                     loyaltyPoints: {
                         balance: {
                             string: points.toString()
@@ -330,23 +357,45 @@ class GoogleWalletService {
                     },
                     textModulesData: [
                         {
-                            id: 'points',
-                            header: 'Puntos',
+                            id: 'points_balance',
+                            header: 'Puntos Disponibles',
                             body: points.toString()
                         }
                     ],
-                    state: 'ACTIVE' // Asegurarnos que la tarjeta está activa
+                    linksModuleData: {
+                        uris: [
+                            {
+                                uri: 'https://spacecards.onrender.com',
+                                description: 'Visita nuestra tienda'
+                            }
+                        ]
+                    },
+                    infoModuleData: {
+                        labelValueRows: [
+                            {
+                                columns: [
+                                    {
+                                        label: 'Monedero Electrónico',
+                                        value: 'Space Pass'
+                                    }
+                                ]
+                            }
+                        ],
+                        showLastUpdateTime: true
+                    }
                 };
                 
                 console.log('Objeto de actualización:', updateObject);
                 
+                console.log('Enviando actualización a Google Wallet:', JSON.stringify(updateObject, null, 2));
+                
                 // Actualizar el objeto completo
-                await this.client.loyaltyobject.update({
+                const result = await this.client.loyaltyobject.update({
                     resourceId: objectId,
                     requestBody: updateObject
                 });
                 
-                console.log('Objeto actualizado correctamente');
+                console.log('Objeto actualizado correctamente:', JSON.stringify(result.data, null, 2));
 
                 return true;
             } catch (error) {

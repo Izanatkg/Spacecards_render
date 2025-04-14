@@ -198,7 +198,7 @@ class GoogleWalletService {
                     balance: {
                         string: points.toString()
                     },
-                    label: 'Space Points'
+                    label: 'Puntos'
                 },
                 barcode: {
                     type: 'QR_CODE',
@@ -230,7 +230,8 @@ class GoogleWalletService {
                 hexFontColor: '#ffd700',
                 textModulesData: [
                     {
-                        header: 'Space Points',
+                        id: 'points',
+                        header: 'Puntos',
                         body: points.toString()
                     }
                 ],
@@ -323,16 +324,18 @@ class GoogleWalletService {
                     ...currentObject.data,
                     loyaltyPoints: {
                         balance: {
-                            string: points.toFixed(2)
+                            string: points.toString()
                         },
-                        label: 'Puntos actuales'
+                        label: 'Puntos'
                     },
                     textModulesData: [
                         {
-                            header: 'Puntos actuales',
-                            body: points.toFixed(2)
+                            id: 'points',
+                            header: 'Puntos',
+                            body: points.toString()
                         }
-                    ]
+                    ],
+                    state: 'ACTIVE' // Asegurarnos que la tarjeta está activa
                 };
                 
                 console.log('Objeto de actualización:', updateObject);
@@ -405,9 +408,9 @@ class GoogleWalletService {
                 accountName: customerName,
                 points: {
                     balance: {
-                        string: points.toFixed(2)
+                        int: points
                     },
-                    label: "Puntos actuales"
+                    label: "Space Points"
                 },
                 textModulesData: [
                     {

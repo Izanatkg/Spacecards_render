@@ -269,7 +269,7 @@ class GoogleWalletService {
             }
 
             // Generar URL de Google Wallet
-            const walletUrl = `https://pay.google.com/gp/v/save/${objectId}`;
+            const walletUrl = `https://maps.app.goo.gl/VznNTGWCky27k2N4A`;
             console.log('Generated wallet URL:', walletUrl);
             
             return walletUrl;

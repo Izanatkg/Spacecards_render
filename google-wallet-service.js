@@ -418,16 +418,11 @@ class GoogleWalletService {
                         }
                     ]
                 },
-                'textModulesData': [
-                    {
-                        'header': 'Space Points',
-                        'body': '0'
-                    }
-                ],
+
                 'linksModuleData': {
                     'uris': [
                         {
-                            'uri': 'https://spacecards-loyalty.onrender.com',
+                            'uri': 'https://maps.app.goo.gl/VznNTGWCky27k2N4A',
                             'description': 'Visitar Space Cards Store'
                         }
                     ]

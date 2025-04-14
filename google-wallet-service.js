@@ -319,78 +319,50 @@ class GoogleWalletService {
                 
                 console.log('Objeto actual:', currentObject.data);
                 
-                // Preparar el objeto de actualización con la estructura completa
+                // Mantener la estructura existente y actualizar solo los puntos
                 const updateObject = {
-                    id: objectId,
-                    classId: this.CLASS_ID,
+                    ...currentObject.data,
                     state: 'ACTIVE',
-                    accountId: currentObject.data.accountId,
-                    accountName: currentObject.data.accountName,
-                    issuerName: this.ISSUER_NAME,
-                    barcode: currentObject.data.barcode,
-                    hexBackgroundColor: '#1a1f2e',
-                    hexFontColor: '#ffd700',
-                    logo: currentObject.data.logo,
-                    cardTitle: {
-                        defaultValue: {
-                            language: 'es',
-                            value: 'Space Pass'
-                        }
-                    },
-                    header: {
-                        defaultValue: {
-                            language: 'es',
-                            value: 'Space Pass'
-                        }
-                    },
-                    subheader: {
-                        defaultValue: {
-                            language: 'es',
-                            value: 'Puntos: ' + points.toString()
-                        }
-                    },
                     loyaltyPoints: {
                         balance: {
                             string: points.toString()
                         },
-                        label: 'Puntos'
+                        label: 'Space Points'
                     },
                     textModulesData: [
                         {
                             id: 'points_balance',
-                            header: 'Puntos Disponibles',
+                            header: 'Space Points',
                             body: points.toString()
                         }
-                    ],
-                    linksModuleData: {
-                        uris: [
-                            {
-                                uri: 'https://spacecards.onrender.com',
-                                description: 'Visita nuestra tienda'
-                            }
-                        ]
-                    },
-                    infoModuleData: {
-                        labelValueRows: [
-                            {
-                                columns: [
-                                    {
-                                        label: 'Monedero Electrónico',
-                                        value: 'Space Pass'
-                                    }
-                                ]
-                            }
-                        ],
-                        showLastUpdateTime: true
-                    }
+                    ]
                 };
+
+                // Asegurarnos que los campos requeridos estén presentes
+                if (!updateObject.cardTitle) {
+                    updateObject.cardTitle = {
+                        defaultValue: {
+                            language: 'es',
+                            value: 'Space Pass'
+                        }
+                    };
+                }
+
+                if (!updateObject.header) {
+                    updateObject.header = {
+                        defaultValue: {
+                            language: 'es',
+                            value: 'Space Pass'
+                        }
+                    };
+                }
                 
                 console.log('Objeto de actualización:', updateObject);
                 
-                console.log('Enviando actualización a Google Wallet:', JSON.stringify(updateObject, null, 2));
+                console.log('Enviando actualización a Google Wallet...');
                 
-                // Actualizar el objeto completo
-                const result = await this.client.loyaltyobject.update({
+                // Actualizar el objeto completo usando patch en lugar de update
+                const result = await this.client.loyaltyobject.patch({
                     resourceId: objectId,
                     requestBody: updateObject
                 });

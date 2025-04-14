@@ -69,41 +69,51 @@ class GoogleWalletService {
         this.baseUrl = 'https://walletobjects.googleapis.com/walletobjects/v1';
         this.CLIENT_ID = process.env.CLIENT_ID;
         this.loyaltyClass = {
-            "id": this.CLASS_ID,
-            "issuerName": "Space Pass",
-            "programName": "Space Pass",
-            "programLogo": {},
-            "reviewStatus": "REVIEW_STATUS_UNSPECIFIED",
-            "version": "1",
-            "hexBackgroundColor": "#FFD700",
-            "hexFontColor": "#000000",
-            "multipleDevicesAndHoldersAllowedStatus": "STATUS_UNSPECIFIED",
-            "messages": [
-                {
-                    "header": "Bienvenido a Space Pass",
-                    "body": "Escanea este código para acumular puntos"
-                }
-            ],
-            "locations": [],
-            "accountIdLabel": "ID de Cliente",
-            "accountNameLabel": "Nombre",
-            "rewardsTier": "REWARDS_TIER_UNSPECIFIED",
-            "secondaryLoyaltyPoints": [],
-            "textModulesData": [
-                {
-                    "header": "Space Points",
-                    "body": "0"
-                }
-            ],
-            "linksModuleData": {
-                "uris": [
+            'id': this.CLASS_ID,
+            'issuerName': this.ISSUER_NAME,
+            'programName': 'Space Pass',
+            'hexBackgroundColor': '#1a1f2e',
+            'hexFontColor': '#ffd700',
+            'reviewStatus': 'UNDER_REVIEW',
+            'allowMultipleUsersPerObject': true,
+            'locations': [],
+            'infoModuleData': {
+                'labelValueRows': [
                     {
-                        "uri": "https://space-pass-nq9e0cv.gamma.site",
-                        "description": "Visitar Space Pass",
-                        "id": "website"
+                        'columns': [
+                            {
+                                'label': 'Programa',
+                                'value': 'Space Pass'
+                            }
+                        ]
                     }
                 ]
-            }
+            },
+            'linksModuleData': {
+                'uris': [
+                    {
+                        'uri': 'https://maps.app.goo.gl/VznNTGWCky27k2N4A',
+                        'description': 'Visitar Space Cards Store'
+                    }
+                ]
+            },
+            'imageModulesData': [
+                {
+                    'mainImage': {
+                        'kind': 'walletobjects#image',
+                        'sourceUri': {
+                            'uri': 'https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:1200/https://cdn.gamma.app/6z3bcs8x5oe1qvh/c027b610096c425b945c5a5fa6f703ed/original/Copia-de-Logo-whats.jpg',
+                            'description': 'Space Cards Background'
+                        }
+                    }
+                }
+            ],
+            'messages': [
+                {
+                    'header': 'Bienvenido a Space Pass',
+                    'body': 'Escanea este código para acumular puntos'
+                }
+            ]
         };
         console.log('Google Wallet service initialized');
     }
@@ -400,9 +410,8 @@ class GoogleWalletService {
                 'id': this.CLASS_ID,
                 'issuerName': this.ISSUER_NAME,
                 'programName': 'Space Pass',
-
-                'hexBackgroundColor': '#FFD700',
-                'hexForegroundColor': '#000000',
+                'hexBackgroundColor': '#1a1f2e',
+                'hexFontColor': '#ffd700',
                 'reviewStatus': 'UNDER_REVIEW',
                 'allowMultipleUsersPerObject': true,
                 'locations': [],
@@ -418,7 +427,6 @@ class GoogleWalletService {
                         }
                     ]
                 },
-
                 'linksModuleData': {
                     'uris': [
                         {
@@ -436,6 +444,12 @@ class GoogleWalletService {
                                 'description': 'Space Cards Background'
                             }
                         }
+                    }
+                ],
+                'messages': [
+                    {
+                        'header': 'Bienvenido a Space Pass',
+                        'body': 'Escanea este código para acumular puntos'
                     }
                 ]
             };

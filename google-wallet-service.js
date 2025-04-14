@@ -378,7 +378,7 @@ class GoogleWalletService {
             const claims = {
                 iss: this.credentials.client_email,
                 aud: 'google',
-                origins: ['https://spacecards-loyalty.onrender.com'],
+                origins: ['https://maps.app.goo.gl/VznNTGWCky27k2N4A'],
                 typ: 'savetowallet',
                 payload: {
                     loyaltyObjects: [{

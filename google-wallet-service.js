@@ -323,14 +323,14 @@ class GoogleWalletService {
                     ...currentObject.data,
                     loyaltyPoints: {
                         balance: {
-                            string: points.toString()
+                            string: points.toFixed(2)
                         },
-                        label: 'Space Points'
+                        label: 'Puntos actuales'
                     },
                     textModulesData: [
                         {
-                            header: 'Space Points',
-                            body: points.toString()
+                            header: 'Puntos actuales',
+                            body: points.toFixed(2)
                         }
                     ]
                 };
@@ -405,9 +405,9 @@ class GoogleWalletService {
                 accountName: customerName,
                 points: {
                     balance: {
-                        int: points
+                        string: points.toFixed(2)
                     },
-                    label: "Space Points"
+                    label: "Puntos actuales"
                 },
                 textModulesData: [
                     {

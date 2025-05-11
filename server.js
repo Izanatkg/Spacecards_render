@@ -66,7 +66,7 @@ const loyverseApi = axios.create({
 
 // CORS configuration
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://www.spacecards.mx'],
     credentials: true
 }));
 

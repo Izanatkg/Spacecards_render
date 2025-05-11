@@ -18,7 +18,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const LOYVERSE_TOKEN = '68c66646696548af983a2a0b8e64c2ec';
+const LOYVERSE_TOKEN = '4373df36552745448b3bee30e59d2093';
 const LOYVERSE_API_URL = 'https://api.loyverse.com/v1.0';
 const LOYVERSE_API_BASE = LOYVERSE_API_URL;
 const COUNTER_FILE = path.join(__dirname, 'customer_counter.txt');

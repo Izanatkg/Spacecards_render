@@ -15,7 +15,7 @@ function Navbar() {
                     <Typography 
                         variant="h6" 
                         component="a" 
-                        href="https://maps.app.goo.gl/VznNTGWCky27k2N4A" 
+                        href="https://space-pass-nq9e0cv.gamma.site/" 
                         sx={{ textDecoration: 'none', color: 'inherit' }}
                     >
                         Space Pass

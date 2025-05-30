@@ -386,6 +386,114 @@ apiRouter.post('/update-points', async (req, res) => {
     }
 });
 
+// Endpoint para iniciar sesión
+apiRouter.post('/login', async (req, res) => {
+    try {
+        const { email, phone } = req.body;
+        
+        if (!email || !phone) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email y teléfono son requeridos'
+            });
+        }
+        
+        // Buscar cliente en Loyverse por email
+        const response = await loyverseApi.get('/customers', {
+            params: { email: email }
+        });
+        
+        if (!response.data.customers || response.data.customers.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Cliente no encontrado. Por favor, verifica tus datos.'
+            });
+        }
+        
+        // Verificar que el teléfono coincida
+        const customer = response.data.customers.find(c => c.phone_number === phone);
+        
+        if (!customer) {
+            return res.status(401).json({
+                success: false,
+                message: 'Credenciales incorrectas. Por favor, verifica tus datos.'
+            });
+        }
+        
+        // Obtener puntos actuales
+        const points = customer.total_points || 0;
+        
+        // Enviar respuesta exitosa
+        res.json({
+            success: true,
+            customer: {
+                id: customer.id,
+                customer_code: customer.customer_code,
+                name: customer.name,
+                email: customer.email,
+                phone: customer.phone_number,
+                points: points
+            }
+        });
+    } catch (error) {
+        console.error('Error durante el inicio de sesión:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Error interno del servidor',
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
+    }
+});
+
+// Endpoint para obtener datos del cliente por código
+apiRouter.get('/customer/:code', async (req, res) => {
+    try {
+        const customerCode = req.params.code;
+        
+        if (!customerCode) {
+            return res.status(400).json({
+                success: false,
+                message: 'Código de cliente requerido'
+            });
+        }
+        
+        // Buscar cliente en Loyverse por código
+        const response = await loyverseApi.get('/customers', {
+            params: { customer_code: customerCode }
+        });
+        
+        if (!response.data.customers || response.data.customers.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Cliente no encontrado'
+            });
+        }
+        
+        const customer = response.data.customers[0];
+        const points = customer.total_points || 0;
+        
+        // Enviar respuesta exitosa
+        res.json({
+            success: true,
+            customer: {
+                id: customer.id,
+                customer_code: customer.customer_code,
+                name: customer.name,
+                email: customer.email,
+                phone: customer.phone_number,
+                points: points
+            }
+        });
+    } catch (error) {
+        console.error('Error al obtener datos del cliente:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Error interno del servidor',
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
+    }
+});
+
 // Endpoint para actualizar puntos
 apiRouter.post('/points/update', async (req, res) => {
     try {
@@ -663,7 +771,7 @@ app.get('*', function(req, res, next) {
 });
 
 // Iniciar el servidor HTTP con WebSocket
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     startPointsPollingForAll();

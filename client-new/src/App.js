@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -69,6 +69,15 @@ const theme = createTheme({
   },
 });
 
+// Componente Home que redirecciona a la URL externa
+function Home() {
+  useEffect(() => {
+    window.location.href = "https://space-pass-nq9e0cv.gamma.site/";
+  }, []);
+  
+  return null; // No renderiza nada mientras redirecciona
+}
+
 function App() {
   return (
     <AuthProvider>
@@ -77,7 +86,8 @@ function App() {
         <Router>
           <Navbar />
           <Routes>
-            <Route path="/" element={<Register />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/register" element={<Register />} />
           </Routes>
         </Router>
       </ThemeProvider>
